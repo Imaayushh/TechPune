@@ -13,14 +13,16 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 const { width } = Dimensions.get('window');
 
-const Dashboard = ({ onLogout, onProfileClick }) => {
+const Dashboard = ({ onLogout, onProfileClick, onMenuClick }) => {
+
     return (
         <SafeAreaView style={styles.container}>
             {/* Header */}
             <View style={styles.header}>
-                <TouchableOpacity style={styles.headerIcon}>
+                <TouchableOpacity style={styles.headerIcon} onPress={onMenuClick}>
                     <Text style={styles.menuIcon}>☰</Text>
                 </TouchableOpacity>
+
                 <Text style={styles.logoText}>TechPune</Text>
                 <TouchableOpacity style={styles.profileIcon} onPress={onProfileClick}>
                     <Text style={styles.userIcon}>👤</Text>

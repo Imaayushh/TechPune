@@ -8,10 +8,14 @@ import * as Font from 'expo-font';
 import LoginPage from './src/LoginPage';
 import Dashboard from './src/Dashboard';
 import ProfilePage from './src/ProfilePage';
+import Hamburger from './src/Hamburger';
+
 
 export default function App() {
   const [view, setView] = useState('login'); // 'login', 'dashboard', 'profile'
+  const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [email, setEmail] = useState('');
+
   const [fontsLoaded, setFontsLoaded] = useState(false);
 
   // Load custom fonts
@@ -48,6 +52,7 @@ export default function App() {
           <Dashboard 
             onLogout={() => setView('login')} 
             onProfileClick={() => setView('profile')}
+            onMenuClick={() => setIsMenuVisible(true)}
           />
         ) : view === 'profile' ? (
           <ProfilePage 
@@ -57,6 +62,23 @@ export default function App() {
         ) : (
           <LoginPage onSignIn={handleSignIn} />
         )}
+
+        {isMenuVisible && (
+          <Hamburger 
+            onBack={() => setIsMenuVisible(false)}
+            onLogout={() => {
+              setIsMenuVisible(false);
+              setView('login');
+            }}
+            onProfileClick={() => {
+              setIsMenuVisible(false);
+              setView('profile');
+            }}
+            userEmail={email}
+          />
+        )}
+
+
       </View>
     </SafeAreaProvider>
   );
