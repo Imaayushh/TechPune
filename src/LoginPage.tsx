@@ -15,9 +15,10 @@ import { Heroicon } from './Heroicon';
 
 type LoginPageProps = {
   onSignIn: (email: string) => void;
+  onTermsPress?: () => void;
 };
 
-export default function LoginPage({ onSignIn }: LoginPageProps) {
+export default function LoginPage({ onSignIn, onTermsPress }: LoginPageProps) {
   const [email, setEmail] = useState('');
 
   const canSubmit = useMemo(() => email.trim().length > 0, [email]);
@@ -91,12 +92,18 @@ export default function LoginPage({ onSignIn }: LoginPageProps) {
                 </TouchableOpacity>
               </View>
 
-              <Text style={styles.termsText}>
-                By joining, you agree to our{' '}
-                <Text style={styles.termsLink}>
-                  Terms & Conditions
-                </Text>
-              </Text>
+               <TouchableOpacity
+                 style={styles.termsText}
+                 activeOpacity={0.8}
+                 onPress={onTermsPress}
+               >
+                 <Text>
+                   By joining, you agree to our{' '}
+                   <Text style={styles.termsLink}>
+                     Terms & Conditions
+                   </Text>
+                 </Text>
+               </TouchableOpacity>
             </View>
           </View>
         </ScrollView>
@@ -208,34 +215,24 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     letterSpacing: 1.4,
   },
-  socialStack: {
-    gap: 12,
-  },
-  secondaryButton: {
-    height: 56,
-    borderRadius: 999,
-    backgroundColor: '#e2e2e2',
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-secondaryButton: {
-    height: 56,
-    borderRadius: 999,
-    backgroundColor: '#e2e2e2',
-    paddingHorizontal: 18,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-  },
-  secondaryButtonText: {
-    fontSize: 15,
-    color: '#1a1c1c',
-    fontFamily: 'Inter-Medium',
-  },
+   socialStack: {
+     gap: 12,
+   },
+   secondaryButton: {
+     height: 56,
+     borderRadius: 999,
+     backgroundColor: '#e2e2e2',
+     paddingHorizontal: 18,
+     flexDirection: 'row',
+     alignItems: 'center',
+     justifyContent: 'center',
+     gap: 10,
+   },
+   secondaryButtonText: {
+     fontSize: 15,
+     color: '#1a1c1c',
+     fontFamily: 'Inter-Medium',
+   },
   termsText: {
     marginTop: 18,
     fontSize: 12,

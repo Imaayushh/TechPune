@@ -66,6 +66,10 @@ const icons: Record<string, string> = {
   'clipboard-document-solid': 'M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 012 2h2a2 2 0 012-2M9 5a2 2 0 012 2v0',
   'briefcase': 'M20 7h-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM10 5h4v2h-4V5zM20 16H4V9h16v7z',
   'briefcase-solid': 'M20 7h-4V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2H4a2 2 0 00-2 2v11a2 2 0 002 2h16a2 2 0 002-2V9a2 2 0 00-2-2zM10 5h4v2h-4V5z',
+  'squares-2x2-solid': 'M4 4h7v7H4V4zm9 0h7v7h-7V4zM4 13h7v7H4v-7zm9 0h7v7h-7v-7z',
+  'academic-cap': 'M12 14l9-5-9-5-9 5 9 5zm0 0v6c-2.5 0-5-1.5-5-1.5v-4.5m5 6c2.5 0 5-1.5 5-1.5v-4.5',
+  'newspaper': 'M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10l4 4v12a2 2 0 01-2 2zM7 8h2v2H7V8zm0 4h10v2H7v-2zm0 4h10v2H7v-2z',
+  'document': 'M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z',
 };
 
 export const Heroicon: React.FC<HeroiconProps> = ({

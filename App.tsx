@@ -9,8 +9,9 @@ import LoginPage from './src/LoginPage';
 import Dashboard from './src/Dashboard';
 import ProfilePage from './src/ProfilePage';
 import Hamburger from './src/Hamburger';
+import TermsAndConditions from './src/TermsAndConditions';
 
-type ViewKey = 'login' | 'dashboard' | 'profile';
+type ViewKey = 'login' | 'dashboard' | 'profile' | 'terms';
 
 export default function App() {
   const [view, setView] = useState<ViewKey>('login');
@@ -55,25 +56,37 @@ export default function App() {
             userName={userName}
             onUpdateName={setUserName}
           />
+        ) : view === 'terms' ? (
+          <TermsAndConditions 
+            onBack={() => setView('dashboard')}
+            onAccept={() => setView('dashboard')}
+          />
         ) : (
-          <LoginPage onSignIn={handleSignIn} />
+           <LoginPage 
+             onSignIn={handleSignIn}
+             onTermsPress={() => setView('terms')}
+           />
         )}
 
-        {isMenuVisible && (
-          <Hamburger
-            onBack={() => setIsMenuVisible(false)}
-            onLogout={() => {
-              setIsMenuVisible(false);
-              setView('login');
-            }}
-            onProfileClick={() => {
-              setIsMenuVisible(false);
-              setView('profile');
-            }}
-            userEmail={email}
-            userName={userName}
-          />
-        )}
+         {isMenuVisible && (
+           <Hamburger
+             onBack={() => setIsMenuVisible(false)}
+             onLogout={() => {
+               setIsMenuVisible(false);
+               setView('login');
+             }}
+             onProfileClick={() => {
+               setIsMenuVisible(false);
+               setView('profile');
+             }}
+             onTermsClick={() => {
+               setIsMenuVisible(false);
+               setView('terms');
+             }}
+             userEmail={email}
+             userName={userName}
+           />
+         )}
       </View>
     </SafeAreaProvider>
   );

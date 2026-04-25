@@ -1,0 +1,809 @@
+{
+  "metadata": {
+    "name": "mobile-app",
+    "description": "",
+    "readme": "\ufffd\ufffd#\u0000 \u0000T\u0000e\u0000c\u0000h\u0000P\u0000u\u0000n\u0000e\u0000\r\u0000\n\u0000",
+    "languages": [
+      "javascript",
+      "json",
+      "markdown",
+      "typescript"
+    ],
+    "frameworks": [
+      "expo",
+      "react",
+      "react-native"
+    ],
+    "totalFiles": 30,
+    "complexity": "small"
+  },
+  "nodes": [
+    {
+      "id": "document:.planning/codebase/ARCHITECTURE.md",
+      "type": "document",
+      "name": "ARCHITECTURE.md",
+      "filePath": ".planning/codebase/ARCHITECTURE.md",
+      "summary": "Describes the project's architectural patterns, layers, and data flow, focusing on the state-controlled navigation system.",
+      "tags": [
+        "documentation",
+        "architecture",
+        "patterns"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.planning/codebase/CONCERNS.md",
+      "type": "document",
+      "name": "CONCERNS.md",
+      "filePath": ".planning/codebase/CONCERNS.md",
+      "summary": "Outlines technical debt, security considerations, and fragile areas of the codebase to guide maintenance and refactoring.",
+      "tags": [
+        "documentation",
+        "maintenance",
+        "security"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.planning/codebase/CONVENTIONS.md",
+      "type": "document",
+      "name": "CONVENTIONS.md",
+      "filePath": ".planning/codebase/CONVENTIONS.md",
+      "summary": "Defines coding style, naming patterns, and module design principles for the project.",
+      "tags": [
+        "documentation",
+        "conventions",
+        "code-style"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.planning/codebase/INTEGRATIONS.md",
+      "type": "document",
+      "name": "INTEGRATIONS.md",
+      "filePath": ".planning/codebase/INTEGRATIONS.md",
+      "summary": "Documents external services, APIs, and data storage integrations used by the application.",
+      "tags": [
+        "documentation",
+        "integrations",
+        "api"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.planning/codebase/STACK.md",
+      "type": "document",
+      "name": "STACK.md",
+      "filePath": ".planning/codebase/STACK.md",
+      "summary": "Specifies the technology stack, including languages, frameworks, and key dependencies like Expo and React Native.",
+      "tags": [
+        "documentation",
+        "tech-stack",
+        "dependencies"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.planning/codebase/STRUCTURE.md",
+      "type": "document",
+      "name": "STRUCTURE.md",
+      "filePath": ".planning/codebase/STRUCTURE.md",
+      "summary": "Explains the directory layout and purpose of various project folders, including the 'tech' subdirectory for legacy or alternative builds.",
+      "tags": [
+        "documentation",
+        "structure",
+        "layout"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "document:.planning/codebase/TESTING.md",
+      "type": "document",
+      "name": "TESTING.md",
+      "filePath": ".planning/codebase/TESTING.md",
+      "summary": "Describes the testing strategy and framework organization for the project.",
+      "tags": [
+        "documentation",
+        "testing",
+        "quality-assurance"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:app.json",
+      "type": "config",
+      "name": "app.json",
+      "filePath": "app.json",
+      "summary": "Expo application configuration specifying app metadata, assets, and platform-specific settings.",
+      "tags": [
+        "configuration",
+        "expo",
+        "manifest"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:App.tsx",
+      "type": "file",
+      "name": "App.tsx",
+      "filePath": "App.tsx",
+      "summary": "Main application component that manages navigation state and renders the appropriate page (Login, OTP, Dashboard, etc.).",
+      "tags": [
+        "entry-point",
+        "navigation",
+        "component"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:App.tsx:App",
+      "type": "function",
+      "name": "App",
+      "filePath": "App.tsx",
+      "lineRange": [
+        15,
+        80
+      ],
+      "summary": "Root functional component of the application, managing view state and user session data.",
+      "tags": [
+        "component",
+        "state-management",
+        "navigation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:declarations.d.ts",
+      "type": "file",
+      "name": "declarations.d.ts",
+      "filePath": "declarations.d.ts",
+      "summary": "TypeScript declaration file providing type definitions for non-code assets like images.",
+      "tags": [
+        "type-definition",
+        "typescript",
+        "assets"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:DESIGN.md",
+      "type": "document",
+      "name": "DESIGN.md",
+      "filePath": "DESIGN.md",
+      "summary": "Specifies 'The Academic Atelier' design system, including colors, typography, and component styling rules.",
+      "tags": [
+        "documentation",
+        "design-system",
+        "styles"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:index.js",
+      "type": "file",
+      "name": "index.js",
+      "filePath": "index.js",
+      "summary": "Entry point for the React Native application, registering the root App component.",
+      "tags": [
+        "entry-point",
+        "bootstrap"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "package.json",
+      "summary": "Node.js project manifest defining dependencies, scripts, and basic metadata.",
+      "tags": [
+        "configuration",
+        "dependencies",
+        "build-system"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "document:README.md",
+      "type": "document",
+      "name": "README.md",
+      "filePath": "README.md",
+      "summary": "Project overview and entry point for documentation.",
+      "tags": [
+        "documentation",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/Dashboard.tsx",
+      "type": "file",
+      "name": "Dashboard.tsx",
+      "filePath": "src/Dashboard.tsx",
+      "summary": "Implements the main dashboard UI, featuring search, categories, and internship listings with premium aesthetics.",
+      "tags": [
+        "component",
+        "dashboard",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/Dashboard.tsx:Dashboard",
+      "type": "function",
+      "name": "Dashboard",
+      "filePath": "src/Dashboard.tsx",
+      "lineRange": [
+        24,
+        194
+      ],
+      "summary": "Functional component for the student dashboard, displaying personalized content and internship cards.",
+      "tags": [
+        "component",
+        "ui",
+        "display"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/Hamburger.tsx",
+      "type": "file",
+      "name": "Hamburger.tsx",
+      "filePath": "src/Hamburger.tsx",
+      "summary": "Implements the side navigation menu with user profile summary and navigation links.",
+      "tags": [
+        "component",
+        "navigation",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/Hamburger.tsx:Hamburger",
+      "type": "function",
+      "name": "Hamburger",
+      "filePath": "src/Hamburger.tsx",
+      "lineRange": [
+        31,
+        113
+      ],
+      "summary": "Drawer-style navigation menu component for switching between application views.",
+      "tags": [
+        "component",
+        "menu",
+        "navigation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/Heroicon.tsx",
+      "type": "file",
+      "name": "Heroicon.tsx",
+      "filePath": "src/Heroicon.tsx",
+      "summary": "A custom SVG icon registry providing a consistent set of icons across the application.",
+      "tags": [
+        "component",
+        "ui",
+        "icons"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/Heroicon.tsx:Heroicon",
+      "type": "function",
+      "name": "Heroicon",
+      "filePath": "src/Heroicon.tsx",
+      "lineRange": [
+        71,
+        97
+      ],
+      "summary": "Dynamic SVG icon component that renders specific icons by name with custom styling options.",
+      "tags": [
+        "component",
+        "utility",
+        "svg"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:src/LoginPage.tsx",
+      "type": "file",
+      "name": "LoginPage.tsx",
+      "filePath": "src/LoginPage.tsx",
+      "summary": "Implements the login screen with email input and authentication triggers.",
+      "tags": [
+        "component",
+        "auth",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/LoginPage.tsx:LoginPage",
+      "type": "function",
+      "name": "LoginPage",
+      "filePath": "src/LoginPage.tsx",
+      "lineRange": [
+        20,
+        106
+      ],
+      "summary": "Functional component for user authentication entry.",
+      "tags": [
+        "component",
+        "login",
+        "form"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/OtpPage.tsx",
+      "type": "file",
+      "name": "OtpPage.tsx",
+      "filePath": "src/OtpPage.tsx",
+      "summary": "Implements the OTP verification screen with timed resend logic and digit-by-digit input.",
+      "tags": [
+        "component",
+        "auth",
+        "ui"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:src/OtpPage.tsx:OtpPage",
+      "type": "function",
+      "name": "OtpPage",
+      "filePath": "src/OtpPage.tsx",
+      "lineRange": [
+        22,
+        106
+      ],
+      "summary": "Functional component for secondary authentication verification.",
+      "tags": [
+        "component",
+        "otp",
+        "auth"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:src/ProfilePage.tsx",
+      "type": "file",
+      "name": "ProfilePage.tsx",
+      "filePath": "src/ProfilePage.tsx",
+      "summary": "Implements the user profile management screen, allowing users to view and update their personal information.",
+      "tags": [
+        "component",
+        "profile",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "function:src/ProfilePage.tsx:ProfilePage",
+      "type": "function",
+      "name": "ProfilePage",
+      "filePath": "src/ProfilePage.tsx",
+      "lineRange": [
+        32,
+        192
+      ],
+      "summary": "Functional component for user profile management and data entry.",
+      "tags": [
+        "component",
+        "form",
+        "user-data"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/App.js",
+      "type": "file",
+      "name": "App.js",
+      "filePath": "tech/mobile-app/App.js",
+      "summary": "Alternative entry point or legacy version of the main application component in the tech subdirectory.",
+      "tags": [
+        "legacy",
+        "component",
+        "navigation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/App.js:App",
+      "type": "function",
+      "name": "App",
+      "filePath": "tech/mobile-app/App.js",
+      "lineRange": [
+        14,
+        85
+      ],
+      "summary": "Legacy functional component for application state management.",
+      "tags": [
+        "component",
+        "legacy"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:tech/mobile-app/app.json",
+      "type": "config",
+      "name": "app.json",
+      "filePath": "tech/mobile-app/app.json",
+      "summary": "Legacy Expo application configuration.",
+      "tags": [
+        "configuration",
+        "legacy",
+        "expo"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tech/mobile-app/index.js",
+      "type": "file",
+      "name": "index.js",
+      "filePath": "tech/mobile-app/index.js",
+      "summary": "Legacy entry point for the mobile application in the tech folder.",
+      "tags": [
+        "legacy",
+        "entry-point"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "config:tech/mobile-app/package.json",
+      "type": "config",
+      "name": "package.json",
+      "filePath": "tech/mobile-app/package.json",
+      "summary": "Legacy Node.js manifest for the tech/mobile-app subproject.",
+      "tags": [
+        "configuration",
+        "legacy",
+        "dependencies"
+      ],
+      "complexity": "simple"
+    },
+    {
+      "id": "file:tech/mobile-app/src/Dashboard.js",
+      "type": "file",
+      "name": "Dashboard.js",
+      "filePath": "tech/mobile-app/src/Dashboard.js",
+      "summary": "Legacy implementation of the student dashboard UI.",
+      "tags": [
+        "legacy",
+        "component",
+        "ui"
+      ],
+      "complexity": "complex"
+    },
+    {
+      "id": "file:tech/mobile-app/src/Hamburger.js",
+      "type": "file",
+      "name": "Hamburger.js",
+      "filePath": "tech/mobile-app/src/Hamburger.js",
+      "summary": "Legacy implementation of the side navigation menu in the tech folder.",
+      "tags": [
+        "legacy",
+        "component",
+        "navigation"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/Hamburger.js:Hamburger",
+      "type": "function",
+      "name": "Hamburger",
+      "filePath": "tech/mobile-app/src/Hamburger.js",
+      "lineRange": [
+        16,
+        118
+      ],
+      "summary": "Legacy functional component for the navigation menu.",
+      "tags": [
+        "component",
+        "legacy"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/src/LoginPage.js",
+      "type": "file",
+      "name": "LoginPage.js",
+      "filePath": "tech/mobile-app/src/LoginPage.js",
+      "summary": "Legacy implementation of the login screen with detailed password validation logic.",
+      "tags": [
+        "legacy",
+        "component",
+        "auth"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/LoginPage.js:LoginPage",
+      "type": "function",
+      "name": "LoginPage",
+      "filePath": "tech/mobile-app/src/LoginPage.js",
+      "lineRange": [
+        23,
+        136
+      ],
+      "summary": "Legacy functional component for user authentication.",
+      "tags": [
+        "component",
+        "legacy",
+        "auth"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/src/OtpPage.js",
+      "type": "file",
+      "name": "OtpPage.js",
+      "filePath": "tech/mobile-app/src/OtpPage.js",
+      "summary": "Legacy implementation of the OTP verification screen.",
+      "tags": [
+        "legacy",
+        "component",
+        "auth"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/OtpPage.js:OtpPage",
+      "type": "function",
+      "name": "OtpPage",
+      "filePath": "tech/mobile-app/src/OtpPage.js",
+      "lineRange": [
+        14,
+        125
+      ],
+      "summary": "Legacy functional component for OTP entry.",
+      "tags": [
+        "component",
+        "legacy",
+        "auth"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/src/ProfilePage.js",
+      "type": "file",
+      "name": "ProfilePage.js",
+      "filePath": "tech/mobile-app/src/ProfilePage.js",
+      "summary": "Legacy implementation of the user profile management screen.",
+      "tags": [
+        "legacy",
+        "component",
+        "profile"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/ProfilePage.js:ProfilePage",
+      "type": "function",
+      "name": "ProfilePage",
+      "filePath": "tech/mobile-app/src/ProfilePage.js",
+      "lineRange": [
+        16,
+        161
+      ],
+      "summary": "Legacy functional component for profile management.",
+      "tags": [
+        "component",
+        "legacy",
+        "profile"
+      ],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript configuration file defining compiler options and project boundaries.",
+      "tags": [
+        "configuration",
+        "typescript",
+        "build"
+      ],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:App.tsx",
+      "target": "function:App.tsx:App",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:App.tsx",
+      "target": "file:src/LoginPage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:App.tsx",
+      "target": "file:src/Dashboard.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:App.tsx",
+      "target": "file:src/ProfilePage.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:App.tsx",
+      "target": "file:src/Hamburger.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:index.js",
+      "target": "file:App.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/Dashboard.tsx",
+      "target": "function:src/Dashboard.tsx:Dashboard",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/Dashboard.tsx",
+      "target": "file:src/Heroicon.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/Hamburger.tsx",
+      "target": "function:src/Hamburger.tsx:Hamburger",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/Heroicon.tsx",
+      "target": "function:src/Heroicon.tsx:Heroicon",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/LoginPage.tsx",
+      "target": "function:src/LoginPage.tsx:LoginPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/LoginPage.tsx",
+      "target": "file:src/Heroicon.tsx",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:src/OtpPage.tsx",
+      "target": "function:src/OtpPage.tsx:OtpPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:src/ProfilePage.tsx",
+      "target": "function:src/ProfilePage.tsx:ProfilePage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/App.js",
+      "target": "function:tech/mobile-app/App.js:App",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/index.js",
+      "target": "file:tech/mobile-app/App.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "config:app.json",
+      "target": "file:index.js",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "document:DESIGN.md",
+      "target": "file:src/Dashboard.tsx",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "document:README.md",
+      "target": "file:index.js",
+      "type": "documents",
+      "direction": "forward",
+      "weight": 0.5
+    },
+    {
+      "source": "file:tech/mobile-app/src/Hamburger.js",
+      "target": "function:tech/mobile-app/src/Hamburger.js:Hamburger",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/src/LoginPage.js",
+      "target": "function:tech/mobile-app/src/LoginPage.js:LoginPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/src/OtpPage.js",
+      "target": "function:tech/mobile-app/src/OtpPage.js:OtpPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/src/ProfilePage.js",
+      "target": "function:tech/mobile-app/src/ProfilePage.js:ProfilePage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:App.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    },
+    {
+      "source": "file:tech/mobile-app/App.js",
+      "target": "file:tech/mobile-app/src/LoginPage.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:tech/mobile-app/App.js",
+      "target": "file:tech/mobile-app/src/Dashboard.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:tech/mobile-app/App.js",
+      "target": "file:tech/mobile-app/src/ProfilePage.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    },
+    {
+      "source": "file:tech/mobile-app/App.js",
+      "target": "file:tech/mobile-app/src/Hamburger.js",
+      "type": "imports",
+      "direction": "forward",
+      "weight": 0.7
+    }
+  ]
+}

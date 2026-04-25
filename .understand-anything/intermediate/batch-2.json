@@ -1,0 +1,126 @@
+{
+  "nodes": [
+    {
+      "id": "file:tech/mobile-app/src/Hamburger.js",
+      "type": "file",
+      "name": "Hamburger.js",
+      "filePath": "tech/mobile-app/src/Hamburger.js",
+      "summary": "Legacy implementation of the side navigation menu in the tech folder.",
+      "tags": ["legacy", "component", "navigation"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/Hamburger.js:Hamburger",
+      "type": "function",
+      "name": "Hamburger",
+      "filePath": "tech/mobile-app/src/Hamburger.js",
+      "lineRange": [16, 118],
+      "summary": "Legacy functional component for the navigation menu.",
+      "tags": ["component", "legacy"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/src/LoginPage.js",
+      "type": "file",
+      "name": "LoginPage.js",
+      "filePath": "tech/mobile-app/src/LoginPage.js",
+      "summary": "Legacy implementation of the login screen with detailed password validation logic.",
+      "tags": ["legacy", "component", "auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/LoginPage.js:LoginPage",
+      "type": "function",
+      "name": "LoginPage",
+      "filePath": "tech/mobile-app/src/LoginPage.js",
+      "lineRange": [23, 136],
+      "summary": "Legacy functional component for user authentication.",
+      "tags": ["component", "legacy", "auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/src/OtpPage.js",
+      "type": "file",
+      "name": "OtpPage.js",
+      "filePath": "tech/mobile-app/src/OtpPage.js",
+      "summary": "Legacy implementation of the OTP verification screen.",
+      "tags": ["legacy", "component", "auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/OtpPage.js:OtpPage",
+      "type": "function",
+      "name": "OtpPage",
+      "filePath": "tech/mobile-app/src/OtpPage.js",
+      "lineRange": [14, 125],
+      "summary": "Legacy functional component for OTP entry.",
+      "tags": ["component", "legacy", "auth"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "file:tech/mobile-app/src/ProfilePage.js",
+      "type": "file",
+      "name": "ProfilePage.js",
+      "filePath": "tech/mobile-app/src/ProfilePage.js",
+      "summary": "Legacy implementation of the user profile management screen.",
+      "tags": ["legacy", "component", "profile"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "function:tech/mobile-app/src/ProfilePage.js:ProfilePage",
+      "type": "function",
+      "name": "ProfilePage",
+      "filePath": "tech/mobile-app/src/ProfilePage.js",
+      "lineRange": [16, 161],
+      "summary": "Legacy functional component for profile management.",
+      "tags": ["component", "legacy", "profile"],
+      "complexity": "moderate"
+    },
+    {
+      "id": "config:tsconfig.json",
+      "type": "config",
+      "name": "tsconfig.json",
+      "filePath": "tsconfig.json",
+      "summary": "TypeScript configuration file defining compiler options and project boundaries.",
+      "tags": ["configuration", "typescript", "build"],
+      "complexity": "simple"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:tech/mobile-app/src/Hamburger.js",
+      "target": "function:tech/mobile-app/src/Hamburger.js:Hamburger",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/src/LoginPage.js",
+      "target": "function:tech/mobile-app/src/LoginPage.js:LoginPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/src/OtpPage.js",
+      "target": "function:tech/mobile-app/src/OtpPage.js:OtpPage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "file:tech/mobile-app/src/ProfilePage.js",
+      "target": "function:tech/mobile-app/src/ProfilePage.js:ProfilePage",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    },
+    {
+      "source": "config:tsconfig.json",
+      "target": "file:App.tsx",
+      "type": "configures",
+      "direction": "forward",
+      "weight": 0.6
+    }
+  ]
+}

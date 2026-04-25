@@ -161,28 +161,28 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
           <View style={styles.bottomNav}>
             <TouchableOpacity style={styles.navItemContainer}>
               <View style={styles.navIconContainerActive}>
-                <Heroicon name="home-solid" size={22} color="#ffffff" />
+                <Heroicon name="squares-2x2-solid" size={20} color="#ffffff" />
               </View>
               <Text style={styles.navLabelActive}>DASHBOARD</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.navItemContainer}>
               <View style={styles.navIconContainer}>
-                <Heroicon name="terminal-solid" size={22} color="#3b3b3b" />
+                <Heroicon name="terminal" size={20} color="#000000" />
               </View>
               <Text style={styles.navLabel}>HACKATHONS</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.navItemContainer}>
               <View style={styles.navIconContainer}>
-                <Heroicon name="bell-solid" size={22} color="#3b3b3b" />
+                <Heroicon name="document" size={20} color="#000000" />
               </View>
               <Text style={styles.navLabel}>NEWS</Text>
             </TouchableOpacity>
 
             <TouchableOpacity style={styles.navItemContainer}>
               <View style={styles.navIconContainer}>
-                <Heroicon name="book-open-solid" size={22} color="#3b3b3b" />
+                <Heroicon name="academic-cap" size={20} color="#000000" />
               </View>
               <Text style={styles.navLabel}>COURSES</Text>
             </TouchableOpacity>
@@ -425,7 +425,7 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     alignItems: 'center',
-    shadowColor: '#1a1c1c',
+    shadowColor: '#000000',
     shadowOffset: { width: 0, height: 20 },
     shadowOpacity: 0.05,
     shadowRadius: 40,
@@ -446,12 +446,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
   },
   navItemContainer: {
+    flex: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
   navIconContainer: {
-    width: 42,
-    height: 42,
+    width: 48,
+    height: 48,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
@@ -459,7 +460,7 @@ const styles = StyleSheet.create({
   navIconContainerActive: {
     width: 48,
     height: 48,
-    backgroundColor: '#1a1c1c',
+    backgroundColor: '#000000',
     borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
@@ -467,13 +468,14 @@ const styles = StyleSheet.create({
   },
   navLabel: {
     fontSize: 10,
-    color: '#5f5e5e',
+    color: '#000000',
+    opacity: 0.6,
     letterSpacing: 0.5,
     fontFamily: 'Inter-Semibold',
   },
   navLabelActive: {
     fontSize: 10,
-    color: '#1a1c1c',
+    color: '#000000',
     letterSpacing: 0.5,
     fontFamily: 'Inter-Semibold',
   },

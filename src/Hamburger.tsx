@@ -24,11 +24,12 @@ export type HamburgerProps = {
   onBack: () => void;
   onLogout: () => void;
   onProfileClick: () => void;
+  onTermsClick?: () => void;
   userEmail?: string;
   userName?: string;
 };
 
-export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail, userName }: HamburgerProps) {
+export default function Hamburger({ onBack, onLogout, onProfileClick, onTermsClick, userEmail, userName }: HamburgerProps) {
   const MenuSection = ({ title, items }: { title: string; items: MenuItem[] }) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -37,11 +38,17 @@ export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail,
           key={`${item.target}-${index}`}
           style={[styles.menuItem, item.active && styles.activeMenuItem]}
           activeOpacity={0.85}
-          onPress={() => {
-            if (item.target === 'dashboard') onBack();
-            else if (item.target === 'profile') onProfileClick();
-            else if (item.target === 'logout') onLogout();
-          }}
+            onPress={() => {
+              if (item.target === 'dashboard') onBack();
+              else if (item.target === 'profile') onProfileClick();
+              else if (item.target === 'terms') {
+                // Close menu and navigate to terms
+                onBack();
+                // Call the terms click callback if provided
+                if (onTermsClick) onTermsClick();
+              }
+              else if (item.target === 'logout') onLogout();
+            }}
         >
           <View style={styles.iconContainer}>
             <Text style={[styles.menuIcon, item.logout && styles.menuIconLogout, item.active && styles.menuIconActive]}>
@@ -63,12 +70,13 @@ export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail,
     { title: 'GUIDANCE', icon: '◻', target: 'guidance' },
   ];
 
-  const accountItems: MenuItem[] = [
-    { title: 'Settings', icon: '⚙', target: 'settings' },
-    { title: 'Privacy & Security', icon: '⟐', target: 'privacy' },
-    { title: 'Help & Support', icon: '?', target: 'help' },
-    { title: 'Profile', icon: '⌁', target: 'profile' },
-  ];
+    const accountItems: MenuItem[] = [
+      { title: 'Settings', icon: '⚙', target: 'settings' },
+      { title: 'Privacy & Security', icon: '⟐', target: 'privacy' },
+      { title: 'Help & Support', icon: '?', target: 'help' },
+      { title: 'Terms & Conditions', icon: '📄', target: 'terms' },
+      { title: 'Profile', icon: '⌁', target: 'profile' },
+    ];
 
   const otherItems: MenuItem[] = [{ title: 'Log Out', icon: '↘', target: 'logout', logout: true }];
 

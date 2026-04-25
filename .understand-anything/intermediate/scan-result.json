@@ -1,0 +1,410 @@
+{
+  "name": "mobile-app",
+  "description": "A React Native (Expo) mobile application named TechPune, featuring a dashboard, profile management, and login screens.",
+  "languages": [
+    "css",
+    "html",
+    "javascript",
+    "json",
+    "markdown",
+    "typescript"
+  ],
+  "frameworks": [
+    "expo",
+    "react",
+    "react-native",
+    "typescript"
+  ],
+  "files": [
+    {
+      "path": ".planning/codebase/ARCHITECTURE.md",
+      "language": "markdown",
+      "sizeLines": 99,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".planning/codebase/CONCERNS.md",
+      "language": "markdown",
+      "sizeLines": 62,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".planning/codebase/CONVENTIONS.md",
+      "language": "markdown",
+      "sizeLines": 88,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".planning/codebase/INTEGRATIONS.md",
+      "language": "markdown",
+      "sizeLines": 56,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".planning/codebase/STACK.md",
+      "language": "markdown",
+      "sizeLines": 76,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".planning/codebase/STRUCTURE.md",
+      "language": "markdown",
+      "sizeLines": 110,
+      "fileCategory": "docs"
+    },
+    {
+      "path": ".planning/codebase/TESTING.md",
+      "language": "markdown",
+      "sizeLines": 30,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "app.json",
+      "language": "json",
+      "sizeLines": 32,
+      "fileCategory": "config"
+    },
+    {
+      "path": "App.tsx",
+      "language": "typescript",
+      "sizeLines": 89,
+      "fileCategory": "code"
+    },
+    {
+      "path": "declarations.d.ts",
+      "language": "typescript",
+      "sizeLines": 11,
+      "fileCategory": "code"
+    },
+    {
+      "path": "DESIGN.md",
+      "language": "markdown",
+      "sizeLines": 102,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "index.js",
+      "language": "javascript",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    },
+    {
+      "path": "package.json",
+      "language": "json",
+      "sizeLines": 33,
+      "fileCategory": "config"
+    },
+    {
+      "path": "README.md",
+      "language": "markdown",
+      "sizeLines": 2,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "src/Dashboard.tsx",
+      "language": "typescript",
+      "sizeLines": 482,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/Hamburger.tsx",
+      "language": "typescript",
+      "sizeLines": 251,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/Heroicon.tsx",
+      "language": "typescript",
+      "sizeLines": 97,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/LoginPage.tsx",
+      "language": "typescript",
+      "sizeLines": 253,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/OtpPage.tsx",
+      "language": "typescript",
+      "sizeLines": 140,
+      "fileCategory": "code"
+    },
+    {
+      "path": "src/ProfilePage.tsx",
+      "language": "typescript",
+      "sizeLines": 438,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/App.js",
+      "language": "javascript",
+      "sizeLines": 93,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/app.json",
+      "language": "json",
+      "sizeLines": 34,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tech/mobile-app/index.js",
+      "language": "javascript",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/package.json",
+      "language": "json",
+      "sizeLines": 25,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tech/mobile-app/src/Dashboard.js",
+      "language": "javascript",
+      "sizeLines": 484,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/src/Hamburger.js",
+      "language": "javascript",
+      "sizeLines": 251,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/src/LoginPage.js",
+      "language": "javascript",
+      "sizeLines": 274,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/src/OtpPage.js",
+      "language": "javascript",
+      "sizeLines": 248,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/mobile-app/src/ProfilePage.js",
+      "language": "javascript",
+      "sizeLines": 371,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/package.json",
+      "language": "json",
+      "sizeLines": 40,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tech/my-app/public/index.html",
+      "language": "html",
+      "sizeLines": 44,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/public/manifest.json",
+      "language": "json",
+      "sizeLines": 26,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tech/my-app/public/robots.txt",
+      "language": "unknown",
+      "sizeLines": 4,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tech/my-app/README.md",
+      "language": "markdown",
+      "sizeLines": 71,
+      "fileCategory": "docs"
+    },
+    {
+      "path": "tech/my-app/src/App.css",
+      "language": "css",
+      "sizeLines": 5,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/src/App.js",
+      "language": "javascript",
+      "sizeLines": 44,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/App.test.js",
+      "language": "javascript",
+      "sizeLines": 9,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/Dashboard.css",
+      "language": "css",
+      "sizeLines": 215,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/src/Dashboard.js",
+      "language": "javascript",
+      "sizeLines": 78,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/index.css",
+      "language": "css",
+      "sizeLines": 6,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/src/index.js",
+      "language": "javascript",
+      "sizeLines": 18,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/LoginPage.css",
+      "language": "css",
+      "sizeLines": 302,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/src/LoginPage.js",
+      "language": "javascript",
+      "sizeLines": 135,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/OtpPage.css",
+      "language": "css",
+      "sizeLines": 174,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/src/OtpPage.js",
+      "language": "javascript",
+      "sizeLines": 104,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/Profile.css",
+      "language": "css",
+      "sizeLines": 268,
+      "fileCategory": "markup"
+    },
+    {
+      "path": "tech/my-app/src/Profile.js",
+      "language": "javascript",
+      "sizeLines": 122,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/reportWebVitals.js",
+      "language": "javascript",
+      "sizeLines": 14,
+      "fileCategory": "code"
+    },
+    {
+      "path": "tech/my-app/src/setupTests.js",
+      "language": "javascript",
+      "sizeLines": 6,
+      "fileCategory": "code"
+    },
+    {
+      "path": "TechPuneApp/package.json",
+      "language": "json",
+      "sizeLines": 1,
+      "fileCategory": "config"
+    },
+    {
+      "path": "tsconfig.json",
+      "language": "json",
+      "sizeLines": 13,
+      "fileCategory": "config"
+    }
+  ],
+  "totalFiles": 51,
+  "filteredByIgnore": 0,
+  "estimatedComplexity": "moderate",
+  "importMap": {
+    ".planning/codebase/ARCHITECTURE.md": [],
+    ".planning/codebase/CONCERNS.md": [],
+    ".planning/codebase/CONVENTIONS.md": [],
+    ".planning/codebase/INTEGRATIONS.md": [],
+    ".planning/codebase/STACK.md": [],
+    ".planning/codebase/STRUCTURE.md": [],
+    ".planning/codebase/TESTING.md": [],
+    "App.tsx": [
+      "src/LoginPage.tsx",
+      "src/Dashboard.tsx",
+      "src/ProfilePage.tsx",
+      "src/Hamburger.tsx"
+    ],
+    "DESIGN.md": [],
+    "README.md": [],
+    "TechPuneApp/package.json": [],
+    "app.json": [],
+    "declarations.d.ts": [],
+    "index.js": [
+      "App.tsx"
+    ],
+    "package.json": [],
+    "src/Dashboard.tsx": [
+      "src/Heroicon.tsx"
+    ],
+    "src/Hamburger.tsx": [],
+    "src/Heroicon.tsx": [],
+    "src/LoginPage.tsx": [
+      "src/Heroicon.tsx"
+    ],
+    "src/OtpPage.tsx": [],
+    "src/ProfilePage.tsx": [],
+    "tech/mobile-app/App.js": [
+      "tech/mobile-app/src/LoginPage.js",
+      "tech/mobile-app/src/Dashboard.js",
+      "tech/mobile-app/src/ProfilePage.js",
+      "tech/mobile-app/src/Hamburger.js"
+    ],
+    "tech/mobile-app/app.json": [],
+    "tech/mobile-app/index.js": [
+      "tech/mobile-app/App.js"
+    ],
+    "tech/mobile-app/package.json": [],
+    "tech/mobile-app/src/Dashboard.js": [],
+    "tech/mobile-app/src/Hamburger.js": [],
+    "tech/mobile-app/src/LoginPage.js": [],
+    "tech/mobile-app/src/OtpPage.js": [],
+    "tech/mobile-app/src/ProfilePage.js": [],
+    "tech/my-app/README.md": [],
+    "tech/my-app/package.json": [],
+    "tech/my-app/public/index.html": [],
+    "tech/my-app/public/manifest.json": [],
+    "tech/my-app/public/robots.txt": [],
+    "tech/my-app/src/App.css": [],
+    "tech/my-app/src/App.js": [
+      "tech/my-app/src/LoginPage.js",
+      "tech/my-app/src/Dashboard.js",
+      "tech/my-app/src/OtpPage.js",
+      "tech/my-app/src/Profile.js"
+    ],
+    "tech/my-app/src/App.test.js": [
+      "tech/my-app/src/App.js"
+    ],
+    "tech/my-app/src/Dashboard.css": [],
+    "tech/my-app/src/Dashboard.js": [],
+    "tech/my-app/src/LoginPage.css": [],
+    "tech/my-app/src/LoginPage.js": [],
+    "tech/my-app/src/OtpPage.css": [],
+    "tech/my-app/src/OtpPage.js": [],
+    "tech/my-app/src/Profile.css": [],
+    "tech/my-app/src/Profile.js": [],
+    "tech/my-app/src/index.css": [],
+    "tech/my-app/src/index.js": [
+      "tech/my-app/src/App.js",
+      "tech/my-app/src/reportWebVitals.js"
+    ],
+    "tech/my-app/src/reportWebVitals.js": [],
+    "tech/my-app/src/setupTests.js": [],
+    "tsconfig.json": []
+  }
+}
