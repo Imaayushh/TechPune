@@ -8,6 +8,7 @@ import {
   Dimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Heroicon } from './Heroicon';
 
 const { width } = Dimensions.get('window');
 
@@ -24,12 +25,12 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerIcon} onPress={onMenuClick} activeOpacity={0.8}>
-          <Text style={styles.headerIconLarge}>≡</Text>
+          <Heroicon name="menu-solid" size={22} color="#1a1c1c" />
         </TouchableOpacity>
 
         <Text style={styles.logoText}>TechPune</Text>
         <TouchableOpacity style={styles.headerIcon} onPress={onProfileClick} activeOpacity={0.8}>
-          <Text style={styles.headerIconLarge}>👤</Text>
+          <Heroicon name="user-solid" size={22} color="#1a1c1c" />
         </TouchableOpacity>
       </View>
 
@@ -106,10 +107,10 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
             </TouchableOpacity>
           </View>
 
-          {/* Recommended Item 1 */}
+          {/* Recommended Item 1 - Internship */}
           <View style={styles.recommendedItem}>
             <View style={styles.iconBox}>
-              <Text style={styles.iconGlyph}>▦</Text>
+              <Heroicon name="briefcase-solid" size={22} color="#3b3b3b" />
             </View>
             <View style={styles.itemInfo}>
               <Text style={styles.itemTitle}>Product Design Internship</Text>
@@ -123,10 +124,10 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
             </View>
           </View>
 
-          {/* Recommended Item 2 */}
+          {/* Recommended Item 2 - Webinar */}
           <View style={styles.recommendedItem}>
             <View style={styles.iconBox}>
-              <Text style={styles.iconGlyph}>▤</Text>
+              <Heroicon name="clipboard-document-solid" size={22} color="#3b3b3b" />
             </View>
             <View style={styles.itemInfo}>
               <Text style={styles.itemTitle}>The Future of Spatial Computing</Text>
@@ -150,30 +151,30 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
         <View style={styles.bottomNav}>
           <TouchableOpacity style={styles.navItemContainer}>
             <View style={styles.navIconContainerActive}>
-              <Text style={styles.navIconActive}>▣</Text>
+              <Heroicon name="home-solid" size={22} color="#ffffff" />
             </View>
             <Text style={styles.navLabelActive}>DASHBOARD</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.navItemContainer}>
             <View style={styles.navIconContainer}>
-              <Text style={styles.navIcon}>▦</Text>
+              <Heroicon name="terminal-solid" size={22} color="#3b3b3b" />
             </View>
             <Text style={styles.navLabel}>HACKATHONS</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.navItemContainer}>
             <View style={styles.navIconContainer}>
-              <Text style={styles.navIcon}>▤</Text>
+              <Heroicon name="bell-solid" size={22} color="#3b3b3b" />
             </View>
             <Text style={styles.navLabel}>NEWS</Text>
           </TouchableOpacity>
 
           <TouchableOpacity style={styles.navItemContainer}>
             <View style={styles.navIconContainer}>
-              <Text style={styles.navIcon}>◻</Text>
+              <Heroicon name="book-open-solid" size={22} color="#3b3b3b" />
             </View>
-            <Text style={styles.navLabel}>GUIDANCE</Text>
+            <Text style={styles.navLabel}>COURSES</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -201,11 +202,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerIconLarge: {
-    fontSize: 28,
-    color: '#1a1c1c',
-    fontFamily: 'Inter-Medium',
-  },
+
   logoText: {
     fontSize: 14,
     letterSpacing: 1.5,
@@ -376,11 +373,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginRight: 16,
   },
-  iconGlyph: {
-    fontSize: 18,
-    color: '#1a1c1c',
-    fontFamily: 'Inter-Semibold',
-  },
   itemInfo: {
     flex: 1,
   },
@@ -459,14 +451,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 4,
-  },
-  navIcon: {
-    fontSize: 20,
-    color: '#5f5e5e',
-  },
-  navIconActive: {
-    fontSize: 20,
-    color: '#ffffff',
   },
   navLabel: {
     fontSize: 10,

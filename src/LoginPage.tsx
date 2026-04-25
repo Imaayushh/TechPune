@@ -9,16 +9,13 @@ import {
   KeyboardAvoidingView,
   Platform,
   Alert,
-  Image,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Heroicon } from './Heroicon';
 
 type LoginPageProps = {
   onSignIn: (email: string) => void;
 };
-
-const googleLogo = require('./google_logo.png');
-const githubLogo = require('./github_logo.png');
 
 export default function LoginPage({ onSignIn }: LoginPageProps) {
   const [email, setEmail] = useState('');
@@ -85,11 +82,11 @@ export default function LoginPage({ onSignIn }: LoginPageProps) {
 
               <View style={styles.socialStack}>
                 <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.8}>
-                  <Image source={googleLogo} style={styles.socialLogo} />
+                  <Heroicon name="google-solid" size={20} color="#1a1c1c" />
                   <Text style={styles.secondaryButtonText}>Continue with Google</Text>
                 </TouchableOpacity>
                 <TouchableOpacity style={styles.secondaryButton} activeOpacity={0.8}>
-                  <Image source={githubLogo} style={styles.socialLogo} />
+                  <Heroicon name="github-solid" size={20} color="#1a1c1c" />
                   <Text style={styles.secondaryButtonText}>Continue with GitHub</Text>
                 </TouchableOpacity>
               </View>
@@ -224,10 +221,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     gap: 10,
   },
-  socialLogo: {
-    width: 18,
-    height: 18,
-    resizeMode: 'contain',
+secondaryButton: {
+    height: 56,
+    borderRadius: 999,
+    backgroundColor: '#e2e2e2',
+    paddingHorizontal: 18,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
   },
   secondaryButtonText: {
     fontSize: 15,
