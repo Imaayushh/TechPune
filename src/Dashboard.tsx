@@ -9,6 +9,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
+import { LinearGradient } from 'expo-linear-gradient';
+import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 
@@ -92,8 +94,15 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
               </View>
               <Text style={styles.progressText}>65% Complete</Text>
             </View>
-            <TouchableOpacity style={styles.resumeButton}>
-              <Text style={styles.resumeButtonText}>Resume Learning  →</Text>
+            <TouchableOpacity activeOpacity={0.85}>
+              <LinearGradient
+                colors={['#000000', '#3b3b3b']}
+                style={styles.resumeButton}
+                start={{ x: 0, y: 0 }}
+                end={{ x: 1, y: 1 }}
+              >
+                <Text style={styles.resumeButtonText}>Resume Learning  →</Text>
+              </LinearGradient>
             </TouchableOpacity>
           </View>
         </View>
@@ -148,35 +157,37 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNavContainer}>
-        <View style={styles.bottomNav}>
-          <TouchableOpacity style={styles.navItemContainer}>
-            <View style={styles.navIconContainerActive}>
-              <Heroicon name="home-solid" size={22} color="#ffffff" />
-            </View>
-            <Text style={styles.navLabelActive}>DASHBOARD</Text>
-          </TouchableOpacity>
+        <BlurView intensity={80} tint="light" style={styles.bottomNavBlur}>
+          <View style={styles.bottomNav}>
+            <TouchableOpacity style={styles.navItemContainer}>
+              <View style={styles.navIconContainerActive}>
+                <Heroicon name="home-solid" size={22} color="#ffffff" />
+              </View>
+              <Text style={styles.navLabelActive}>DASHBOARD</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navItemContainer}>
-            <View style={styles.navIconContainer}>
-              <Heroicon name="terminal-solid" size={22} color="#3b3b3b" />
-            </View>
-            <Text style={styles.navLabel}>HACKATHONS</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.navItemContainer}>
+              <View style={styles.navIconContainer}>
+                <Heroicon name="terminal-solid" size={22} color="#3b3b3b" />
+              </View>
+              <Text style={styles.navLabel}>HACKATHONS</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navItemContainer}>
-            <View style={styles.navIconContainer}>
-              <Heroicon name="bell-solid" size={22} color="#3b3b3b" />
-            </View>
-            <Text style={styles.navLabel}>NEWS</Text>
-          </TouchableOpacity>
+            <TouchableOpacity style={styles.navItemContainer}>
+              <View style={styles.navIconContainer}>
+                <Heroicon name="bell-solid" size={22} color="#3b3b3b" />
+              </View>
+              <Text style={styles.navLabel}>NEWS</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navItemContainer}>
-            <View style={styles.navIconContainer}>
-              <Heroicon name="book-open-solid" size={22} color="#3b3b3b" />
-            </View>
-            <Text style={styles.navLabel}>COURSES</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity style={styles.navItemContainer}>
+              <View style={styles.navIconContainer}>
+                <Heroicon name="book-open-solid" size={22} color="#3b3b3b" />
+              </View>
+              <Text style={styles.navLabel}>COURSES</Text>
+            </TouchableOpacity>
+          </View>
+        </BlurView>
       </View>
     </SafeAreaView>
   );
@@ -349,7 +360,6 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
   },
   resumeButton: {
-    backgroundColor: '#1a1c1c',
     height: 56,
     borderRadius: 999,
     justifyContent: 'center',
@@ -415,22 +425,25 @@ const styles = StyleSheet.create({
     left: 20,
     right: 20,
     alignItems: 'center',
+    shadowColor: '#1a1c1c',
+    shadowOffset: { width: 0, height: 20 },
+    shadowOpacity: 0.05,
+    shadowRadius: 40,
+    elevation: 0,
+  },
+  bottomNavBlur: {
+    width: '100%',
+    borderRadius: 24,
+    overflow: 'hidden',
   },
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: '#ffffff',
+    backgroundColor: 'rgba(249, 249, 249, 0.75)',
     width: '100%',
     height: 85,
-    borderRadius: 24,
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 15,
-    // Shadow
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 10 },
-    shadowOpacity: 0.08,
-    shadowRadius: 20,
-    elevation: 8,
   },
   navItemContainer: {
     alignItems: 'center',

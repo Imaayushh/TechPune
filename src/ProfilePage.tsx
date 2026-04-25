@@ -11,6 +11,7 @@ import {
   Switch,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { LinearGradient } from 'expo-linear-gradient';
 
 export type ProfilePageProps = {
   onBack: () => void;
@@ -171,12 +172,19 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
       {/* Continue Button */}
       <View style={styles.continueContainer}>
         <TouchableOpacity
-          style={[styles.continueButton, !personalInfo.fullName.trim() && styles.continueButtonDisabled]}
+          style={!personalInfo.fullName.trim() && styles.continueButtonDisabled}
           onPress={handleContinue}
           disabled={!personalInfo.fullName.trim()}
           activeOpacity={0.85}
         >
-          <Text style={styles.continueButtonText}>Continue →</Text>
+          <LinearGradient
+            colors={['#000000', '#3b3b3b']}
+            style={styles.continueButton}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Text style={styles.continueButtonText}>Continue →</Text>
+          </LinearGradient>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -213,6 +221,9 @@ const styles = StyleSheet.create({
     letterSpacing: 2.2,
     color: '#1a1c1c',
     fontFamily: 'Inter-Semibold',
+    textAlign: 'left',
+    flex: 1,
+    marginLeft: 16,
   },
   scrollContent: {
     paddingBottom: 48,
@@ -303,7 +314,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Inter-Semibold',
   },
-  infoFields: {},
+  infoFields: {
+    paddingLeft: 24, // Editorial tension: indenting form fields
+  },
   fieldItem: {
     paddingVertical: 10,
   },
@@ -384,8 +397,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Semibold',
   },
   fieldInputError: {
-    borderWidth: 1.5,
-    borderColor: '#e53935',
+    borderBottomWidth: 1.5,
+    borderBottomColor: '#e53935',
+    backgroundColor: '#ffebee',
+    borderBottomLeftRadius: 0,
+    borderBottomRightRadius: 0,
   },
   fieldValueEmpty: {
     color: '#9a9a9a',
@@ -401,19 +417,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     backgroundColor: '#f9f9f9',
-    borderTopWidth: 1,
-    borderTopColor: '#eeeeee',
   },
   continueButton: {
     height: 58,
     borderRadius: 999,
-    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
   },
   continueButtonDisabled: {
     opacity: 0.4,
-    backgroundColor: '#333333',
   },
   continueButtonText: {
     color: '#e2e2e2',
