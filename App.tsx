@@ -17,6 +17,8 @@ export default function App() {
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [email, setEmail] = useState('');
 
+  const [userName, setUserName] = useState('');
+
   const [fontsLoaded] = useFonts({
     'ClashDisplay-Bold': require('./src/assets/fonts/ClashDisplay-Bold.ttf'),
     'CabinetGrotesk-Medium': require('./src/assets/fonts/CabinetGrotesk-Medium.ttf'),
@@ -30,7 +32,7 @@ export default function App() {
 
   const handleSignIn = (userEmail: string) => {
     setEmail(userEmail);
-    setView('dashboard');
+    setView('profile');
   };
 
   return (
@@ -43,9 +45,16 @@ export default function App() {
             onLogout={() => setView('login')}
             onProfileClick={() => setView('profile')}
             onMenuClick={() => setIsMenuVisible(true)}
+            userName={userName}
           />
         ) : view === 'profile' ? (
-          <ProfilePage onBack={() => setView('dashboard')} userEmail={email} />
+          <ProfilePage 
+            onBack={() => setView('dashboard')} 
+            userEmail={email} 
+            onContinue={() => setView('dashboard')}
+            userName={userName}
+            onUpdateName={setUserName}
+          />
         ) : (
           <LoginPage onSignIn={handleSignIn} />
         )}
@@ -62,6 +71,7 @@ export default function App() {
               setView('profile');
             }}
             userEmail={email}
+            userName={userName}
           />
         )}
       </View>

@@ -15,30 +15,31 @@ export type DashboardProps = {
   onLogout: () => void;
   onProfileClick: () => void;
   onMenuClick: () => void;
+  userName?: string;
 };
 
-export default function Dashboard({ onProfileClick, onMenuClick }: DashboardProps) {
+export default function Dashboard({ onProfileClick, onMenuClick, userName }: DashboardProps) {
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity style={styles.headerIcon} onPress={onMenuClick} activeOpacity={0.8}>
-          <Text style={styles.headerIconText}>≡</Text>
+          <Text style={styles.headerIconLarge}>≡</Text>
         </TouchableOpacity>
 
-        <Text style={styles.logoText}>OPPORTUNITY</Text>
+        <Text style={styles.logoText}>TechPune</Text>
         <TouchableOpacity style={styles.headerIcon} onPress={onProfileClick} activeOpacity={0.8}>
-          <Text style={styles.headerIconText}>⌁</Text>
+          <Text style={styles.headerIconLarge}>👤</Text>
         </TouchableOpacity>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
         <View style={styles.heroSection}>
-          <Text style={styles.welcomeBack}>WELCOME BACK</Text>
-          <Text style={styles.heroTitle}>Curated{'\n'}Opportunities</Text>
+          <Text style={styles.welcomeText}>Welcome</Text>
+          <Text style={styles.userNameHero}>{userName || 'User'}</Text>
           <Text style={styles.heroDescription}>
-            A bespoke selection of hackathons, courses, and internships tailored to your growing expertise.
+            A dedicated Platform for hackathons and daily Updates.
           </Text>
         </View>
 
@@ -195,21 +196,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#f9f9f9',
   },
   headerIcon: {
-    width: 44,
-    height: 44,
+    width: 50,
+    height: 50,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  headerIconText: {
-    fontSize: 18,
+  headerIconLarge: {
+    fontSize: 28,
     color: '#1a1c1c',
     fontFamily: 'Inter-Medium',
   },
   logoText: {
-    fontSize: 11,
-    letterSpacing: 2.2,
+    fontSize: 14,
+    letterSpacing: 1.5,
     color: '#1a1c1c',
-    fontFamily: 'Inter-Semibold',
+    fontFamily: 'ClashDisplay-Bold',
+    textTransform: 'uppercase',
   },
   scrollContent: {
     paddingHorizontal: 20,
@@ -218,17 +220,16 @@ const styles = StyleSheet.create({
   heroSection: {
     marginBottom: 26,
   },
-  welcomeBack: {
-    fontSize: 12,
-    color: '#5f5e5e',
-    letterSpacing: 2,
-    marginBottom: 10,
-    fontFamily: 'Inter-Semibold',
-  },
-  heroTitle: {
+  welcomeText: {
     fontSize: 42,
     color: '#1a1c1c',
+    fontFamily: 'ClashDisplay-Bold',
     lineHeight: 46,
+  },
+  userNameHero: {
+    fontSize: 34,
+    color: '#1a1c1c',
+    lineHeight: 38,
     marginBottom: 14,
     fontFamily: 'ClashDisplay-Bold',
   },
@@ -432,6 +433,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 15,
+    // Shadow
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.08,
+    shadowRadius: 20,
+    elevation: 8,
   },
   navItemContainer: {
     alignItems: 'center',

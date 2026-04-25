@@ -37,15 +37,15 @@ export default function LoginPage({ onSignIn }: LoginPageProps) {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.brandBlock}>
-            <Text style={styles.brandTitle}>The Atelier</Text>
+            <Text style={styles.brandTitle}>TechPune</Text>
             <Text style={styles.brandSubtitle}>
-              Curated opportunities for the discerning scholar.
+              Platform for Hackathons And Daily Updates
             </Text>
           </View>
 
           <View style={styles.card}>
             <Text style={styles.cardTitle}>
-              Join the{'\n'}Journal.
+              Join our community Today.
             </Text>
 
             <View style={styles.form}>
@@ -74,7 +74,7 @@ export default function LoginPage({ onSignIn }: LoginPageProps) {
                 }}
                 activeOpacity={0.85}
               >
-                <Text style={styles.primaryButtonText}>Sign Up</Text>
+                <Text style={styles.primaryButtonText}>Sign In</Text>
               </TouchableOpacity>
 
               <View style={styles.orRow}>
@@ -97,7 +97,7 @@ export default function LoginPage({ onSignIn }: LoginPageProps) {
               <Text style={styles.termsText}>
                 By joining, you agree to our{' '}
                 <Text style={styles.termsLink}>
-                  Terms of{'\n'}Curatorship.
+                  Terms & Conditions
                 </Text>
               </Text>
             </View>

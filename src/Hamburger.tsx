@@ -25,9 +25,10 @@ export type HamburgerProps = {
   onLogout: () => void;
   onProfileClick: () => void;
   userEmail?: string;
+  userName?: string;
 };
 
-export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail }: HamburgerProps) {
+export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail, userName }: HamburgerProps) {
   const MenuSection = ({ title, items }: { title: string; items: MenuItem[] }) => (
     <View style={styles.section}>
       <Text style={styles.sectionTitle}>{title}</Text>
@@ -91,7 +92,7 @@ export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail 
                 <Text style={styles.avatarEmoji}>⌁</Text>
               </View>
               <View style={styles.profileInfo}>
-                <Text style={styles.userName}>Scholar</Text>
+                <Text style={styles.userName}>{userName || 'User'}</Text>
                 <Text style={styles.userEmail}>{userEmail || 'scholar@university.edu'}</Text>
               </View>
             </View>
@@ -99,7 +100,9 @@ export default function Hamburger({ onBack, onLogout, onProfileClick, userEmail 
 
           <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
             <MenuSection title="MAIN" items={mainItems} />
+            <View style={styles.divider} />
             <MenuSection title="ACCOUNT" items={accountItems} />
+            <View style={styles.divider} />
             <MenuSection title="OTHER" items={otherItems} />
             <View style={{ height: 40 }} />
           </ScrollView>
@@ -129,10 +132,10 @@ const styles = StyleSheet.create({
   drawerContainer: {
     width: width * 0.8,
     height,
-    backgroundColor: '#e2e2e2',
+    backgroundColor: '#000000', // AMOLED Black
     shadowColor: '#000',
     shadowOffset: { width: 5, height: 0 },
-    shadowOpacity: 0.08,
+    shadowOpacity: 0.2,
     shadowRadius: 30,
     elevation: 10,
   },
@@ -153,7 +156,7 @@ const styles = StyleSheet.create({
   },
   closeText: {
     fontSize: 22,
-    color: '#1a1c1c',
+    color: '#ffffff',
     fontFamily: 'Inter-Medium',
   },
   profileSection: {
@@ -164,14 +167,14 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#ffffff',
+    backgroundColor: '#121212',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 15,
   },
   avatarEmoji: {
     fontSize: 18,
-    color: '#1a1c1c',
+    color: '#ffffff',
     fontFamily: 'Inter-Semibold',
   },
   profileInfo: {
@@ -179,13 +182,13 @@ const styles = StyleSheet.create({
   },
   userName: {
     fontSize: 26,
-    color: '#1a1c1c',
+    color: '#ffffff',
     fontFamily: 'ClashDisplay-Bold',
     marginBottom: 4,
   },
   userEmail: {
     fontSize: 13,
-    color: '#5f5e5e',
+    color: '#9a9a9a',
     fontFamily: 'Inter-Regular',
   },
   scrollContent: {
@@ -197,11 +200,18 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 11,
-    color: '#5f5e5e',
+    color: '#9a9a9a',
     letterSpacing: 1.8,
     marginBottom: 15,
     marginLeft: 10,
     fontFamily: 'Inter-Semibold',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#333333',
+    marginHorizontal: 10,
+    marginBottom: 20,
+    opacity: 0.5,
   },
   menuItem: {
     flexDirection: 'row',
@@ -210,10 +220,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     borderRadius: 16,
     marginBottom: 4,
-    backgroundColor: '#eeeeee',
+    backgroundColor: 'transparent',
   },
   activeMenuItem: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#121212',
   },
   iconContainer: {
     width: 32,
@@ -224,17 +234,17 @@ const styles = StyleSheet.create({
   },
   menuIcon: {
     fontSize: 18,
-    color: '#1a1c1c',
+    color: '#e2e2e2',
     fontFamily: 'Inter-Semibold',
   },
-  menuIconActive: { color: '#1a1c1c' },
-  menuIconLogout: { color: '#1a1c1c' },
+  menuIconActive: { color: '#ffffff' },
+  menuIconLogout: { color: '#ff4444' },
   menuText: {
     fontSize: 16,
-    color: '#1a1c1c',
+    color: '#e2e2e2',
     fontFamily: 'CabinetGrotesk-Medium',
   },
-  menuTextActive: { color: '#1a1c1c', fontFamily: 'CabinetGrotesk-Bold' },
-  menuTextLogout: { color: '#1a1c1c' },
+  menuTextActive: { color: '#ffffff', fontFamily: 'CabinetGrotesk-Bold' },
+  menuTextLogout: { color: '#ff4444' },
 });
 

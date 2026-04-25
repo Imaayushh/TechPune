@@ -14,7 +14,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 export type ProfilePageProps = {
   onBack: () => void;
+  onContinue?: () => void;
   userEmail?: string;
+  userName?: string;
+  onUpdateName?: (name: string) => void;
 };
 
 type PersonalInfo = {
@@ -25,13 +28,13 @@ type PersonalInfo = {
   dob: string;
 };
 
-export default function ProfilePage({ onBack, userEmail }: ProfilePageProps) {
+export default function ProfilePage({ onBack, onContinue, userEmail, userName, onUpdateName }: ProfilePageProps) {
   const [profileImage, setProfileImage] = useState<string | null>(null);
   const [isEditing, setIsEditing] = useState(false);
-  const [is2FAEnabled, setIs2FAEnabled] = useState(true);
+  const [nameError, setNameError] = useState(false);
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
-    fullName: 'Admin User',
+    fullName: userName,
     email: userEmail || 'admin@techpune.com',
     mobile: '+91 9876543210',
     address: '123 Tech Park, Pune, Maharashtra',
@@ -43,8 +46,18 @@ export default function ProfilePage({ onBack, userEmail }: ProfilePageProps) {
   };
 
   const toggleEdit = () => {
-    if (isEditing) Alert.alert('Success', 'Profile information updated.');
+    if (isEditing) {
+      if (onUpdateName) onUpdateName(personalInfo.fullName);
+      Alert.alert('Success', 'Profile information updated.');
+    }
     setIsEditing(!isEditing);
+  };
+
+  const handleContinue = () => {
+    if (!personalInfo.fullName.trim()) return;
+    setNameError(false);
+    if (onUpdateName) onUpdateName(personalInfo.fullName);
+    if (onContinue) onContinue();
   };
 
   const handleAction = (action: string) => {
@@ -56,22 +69,34 @@ export default function ProfilePage({ onBack, userEmail }: ProfilePageProps) {
     value: string,
     key: keyof PersonalInfo,
     isLast = false,
-    keyboardType: 'default' | 'email-address' | 'phone-pad' = 'default'
+    keyboardType: 'default' | 'email-address' | 'phone-pad' = 'default',
+    required = false
   ) => (
     <View key={key} style={[styles.fieldItem, !isLast && styles.fieldItemSpacing]}>
-      <Text style={styles.fieldLabel}>{label}</Text>
+      <View style={styles.fieldLabelRow}>
+        <Text style={styles.fieldLabel}>{label}</Text>
+        {required && <Text style={styles.requiredStar}> *</Text>}
+      </View>
       {isEditing ? (
-        <View style={styles.fieldInputShell}>
+        <View style={[styles.fieldInputShell, required && nameError && key === 'fullName' && styles.fieldInputError]}>
           <TextInput
             style={styles.fieldInput}
             value={value}
-            onChangeText={(text) => setPersonalInfo({ ...personalInfo, [key]: text })}
+            onChangeText={(text) => {
+              setPersonalInfo({ ...personalInfo, [key]: text });
+              if (key === 'fullName' && text.trim()) setNameError(false);
+            }}
             keyboardType={keyboardType}
             autoCapitalize="none"
           />
         </View>
       ) : (
-        <Text style={styles.fieldValue}>{value}</Text>
+        <Text style={[styles.fieldValue, required && !value.trim() && styles.fieldValueEmpty]}>
+          {value || 'Not set'}
+        </Text>
+      )}
+      {required && nameError && key === 'fullName' && (
+        <Text style={styles.errorText}>Full name is required</Text>
       )}
     </View>
   );
@@ -116,7 +141,7 @@ export default function ProfilePage({ onBack, userEmail }: ProfilePageProps) {
           </View>
 
           <View style={styles.infoFields}>
-            {renderField('Full Name', personalInfo.fullName, 'fullName')}
+            {renderField('Full Name', personalInfo.fullName, 'fullName', false, 'default', true)}
             {renderField('Email Address', personalInfo.email, 'email', false, 'email-address')}
             {renderField('Mobile Number', personalInfo.mobile, 'mobile')}
             {renderField('Address', personalInfo.address, 'address')}
@@ -125,35 +150,6 @@ export default function ProfilePage({ onBack, userEmail }: ProfilePageProps) {
         </View>
 
         <View style={styles.additionalSettings}>
-          <TouchableOpacity
-            style={styles.actionItem}
-            onPress={() => handleAction('Change Password')}
-            activeOpacity={0.85}
-          >
-            <View style={styles.actionLeft}>
-              <View style={styles.iconBox}>
-                <Text style={styles.blackIcon}>▦</Text>
-              </View>
-              <Text style={styles.actionText}>Change Password</Text>
-            </View>
-            <Text style={styles.chevron}>→</Text>
-          </TouchableOpacity>
-
-          <View style={styles.actionItem}>
-            <View style={styles.actionLeft}>
-              <View style={styles.iconBox}>
-                <Text style={styles.blackIcon}>▤</Text>
-              </View>
-              <Text style={styles.actionText}>Two-Factor Authentication</Text>
-            </View>
-            <Switch
-              value={is2FAEnabled}
-              onValueChange={setIs2FAEnabled}
-              trackColor={{ false: '#e2e2e2', true: '#3b3b3b' }}
-              thumbColor={'#ffffff'}
-            />
-          </View>
-
           <TouchableOpacity
             style={styles.actionItem}
             onPress={() => handleAction('Help & Support')}
@@ -171,6 +167,18 @@ export default function ProfilePage({ onBack, userEmail }: ProfilePageProps) {
 
         <View style={{ height: 40 }} />
       </ScrollView>
+
+      {/* Continue Button */}
+      <View style={styles.continueContainer}>
+        <TouchableOpacity
+          style={[styles.continueButton, !personalInfo.fullName.trim() && styles.continueButtonDisabled]}
+          onPress={handleContinue}
+          disabled={!personalInfo.fullName.trim()}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.continueButtonText}>Continue →</Text>
+        </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 }
@@ -364,6 +372,54 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: '#5f5e5e',
     fontFamily: 'Inter-Medium',
+  },
+  fieldLabelRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 6,
+  },
+  requiredStar: {
+    fontSize: 13,
+    color: '#e53935',
+    fontFamily: 'Inter-Semibold',
+  },
+  fieldInputError: {
+    borderWidth: 1.5,
+    borderColor: '#e53935',
+  },
+  fieldValueEmpty: {
+    color: '#9a9a9a',
+    fontStyle: 'italic',
+  },
+  errorText: {
+    fontSize: 11,
+    color: '#e53935',
+    fontFamily: 'Inter-Regular',
+    marginTop: 4,
+  },
+  continueContainer: {
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: '#f9f9f9',
+    borderTopWidth: 1,
+    borderTopColor: '#eeeeee',
+  },
+  continueButton: {
+    height: 58,
+    borderRadius: 999,
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  continueButtonDisabled: {
+    opacity: 0.4,
+    backgroundColor: '#333333',
+  },
+  continueButtonText: {
+    color: '#e2e2e2',
+    fontSize: 16,
+    fontFamily: 'Inter-Semibold',
+    letterSpacing: 0.2,
   },
 });
 
