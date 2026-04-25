@@ -10,8 +10,10 @@ import Dashboard from './src/Dashboard';
 import ProfilePage from './src/ProfilePage';
 import Hamburger from './src/Hamburger';
 
+type ViewKey = 'login' | 'dashboard' | 'profile';
+
 export default function App() {
-  const [view, setView] = useState('login'); // 'login', 'dashboard', 'profile'
+  const [view, setView] = useState<ViewKey>('login');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [email, setEmail] = useState('');
 
@@ -24,11 +26,9 @@ export default function App() {
     'Inter-Semibold': Inter_600SemiBold,
   });
 
-  if (!fontsLoaded) {
-    return null; // Or a loading screen
-  }
+  if (!fontsLoaded) return null;
 
-  const handleSignIn = (userEmail) => {
+  const handleSignIn = (userEmail: string) => {
     setEmail(userEmail);
     setView('dashboard');
   };
@@ -37,23 +37,21 @@ export default function App() {
     <SafeAreaProvider>
       <View style={styles.container}>
         <StatusBar style="auto" />
+
         {view === 'dashboard' ? (
-          <Dashboard 
-            onLogout={() => setView('login')} 
+          <Dashboard
+            onLogout={() => setView('login')}
             onProfileClick={() => setView('profile')}
             onMenuClick={() => setIsMenuVisible(true)}
           />
         ) : view === 'profile' ? (
-          <ProfilePage 
-            onBack={() => setView('dashboard')} 
-            userEmail={email}
-          />
+          <ProfilePage onBack={() => setView('dashboard')} userEmail={email} />
         ) : (
           <LoginPage onSignIn={handleSignIn} />
         )}
 
         {isMenuVisible && (
-          <Hamburger 
+          <Hamburger
             onBack={() => setIsMenuVisible(false)}
             onLogout={() => {
               setIsMenuVisible(false);
@@ -66,8 +64,6 @@ export default function App() {
             userEmail={email}
           />
         )}
-
-
       </View>
     </SafeAreaProvider>
   );
@@ -79,3 +75,4 @@ const styles = StyleSheet.create({
     backgroundColor: '#f8fafc',
   },
 });
+

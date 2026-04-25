@@ -13,10 +13,14 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
+type LoginPageProps = {
+  onSignIn: (email: string) => void;
+};
+
 const googleLogo = require('./google_logo.png');
 const githubLogo = require('./github_logo.png');
 
-const LoginPage = ({ onSignIn }) => {
+export default function LoginPage({ onSignIn }: LoginPageProps) {
   const [email, setEmail] = useState('');
 
   const canSubmit = useMemo(() => email.trim().length > 0, [email]);
@@ -91,7 +95,10 @@ const LoginPage = ({ onSignIn }) => {
               </View>
 
               <Text style={styles.termsText}>
-                By joining, you agree to our <Text style={styles.termsLink}>Terms of{'\n'}Curatorship.</Text>
+                By joining, you agree to our{' '}
+                <Text style={styles.termsLink}>
+                  Terms of{'\n'}Curatorship.
+                </Text>
               </Text>
             </View>
           </View>
@@ -99,7 +106,7 @@ const LoginPage = ({ onSignIn }) => {
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   safeArea: {
@@ -241,4 +248,3 @@ const styles = StyleSheet.create({
   },
 });
 
-export default LoginPage;
