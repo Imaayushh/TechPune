@@ -10,15 +10,17 @@ import Dashboard from './src/Dashboard';
 import ProfilePage from './src/ProfilePage';
 import Hamburger from './src/Hamburger';
 import TermsAndConditions from './src/TermsAndConditions';
+import OnboardingPage from './src/OnboardingPage';
 
-type ViewKey = 'login' | 'dashboard' | 'profile' | 'terms';
+type ViewKey = 'login' | 'onboarding' | 'dashboard' | 'profile' | 'terms';
 
 export default function App() {
   const [view, setView] = useState<ViewKey>('login');
   const [isMenuVisible, setIsMenuVisible] = useState(false);
   const [email, setEmail] = useState('');
-
   const [userName, setUserName] = useState('');
+  const [userCollege, setUserCollege] = useState('');
+  const [userYear, setUserYear] = useState('');
 
   const [fontsLoaded] = useFonts({
     'ClashDisplay-Bold': require('./src/assets/fonts/ClashDisplay-Bold.ttf'),
@@ -33,7 +35,14 @@ export default function App() {
 
   const handleSignIn = (userEmail: string) => {
     setEmail(userEmail);
-    setView('profile');
+    setView('onboarding');
+  };
+
+  const handleOnboardingComplete = (data: any) => {
+    setUserName(data.name);
+    setUserCollege(data.college);
+    setUserYear(data.year);
+    setView('dashboard');
   };
 
   return (
@@ -47,6 +56,10 @@ export default function App() {
             onProfileClick={() => setView('profile')}
             onMenuClick={() => setIsMenuVisible(true)}
             userName={userName}
+          />
+        ) : view === 'onboarding' ? (
+          <OnboardingPage
+            onComplete={handleOnboardingComplete}
           />
         ) : view === 'profile' ? (
           <ProfilePage 
@@ -95,7 +108,6 @@ export default function App() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f8fafc',
+    backgroundColor: '#f9f9f9',
   },
 });
-

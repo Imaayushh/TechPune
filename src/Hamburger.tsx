@@ -15,7 +15,7 @@ const { width, height } = Dimensions.get('window');
 type MenuItem = {
   title: string;
   icon: string;
-  target: 'dashboard' | 'profile' | 'hackathons' | 'news' | 'guidance' | 'settings' | 'privacy' | 'help' | 'logout';
+  target: 'dashboard' | 'profile' | 'hackathons' | 'news' | 'guidance' | 'settings' | 'privacy' | 'help' | 'logout' | 'terms';
   active?: boolean;
   logout?: boolean;
 };
@@ -42,9 +42,7 @@ export default function Hamburger({ onBack, onLogout, onProfileClick, onTermsCli
               if (item.target === 'dashboard') onBack();
               else if (item.target === 'profile') onProfileClick();
               else if (item.target === 'terms') {
-                // Close menu and navigate to terms
                 onBack();
-                // Call the terms click callback if provided
                 if (onTermsClick) onTermsClick();
               }
               else if (item.target === 'logout') onLogout();
@@ -82,15 +80,12 @@ export default function Hamburger({ onBack, onLogout, onProfileClick, onTermsCli
 
   return (
     <View style={styles.overlay}>
-      {/* Backdrop */}
       <TouchableWithoutFeedback onPress={onBack}>
         <View style={styles.backdrop} />
       </TouchableWithoutFeedback>
 
-      {/* Drawer Content */}
       <View style={styles.drawerContainer}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Header / Profile Section */}
           <View style={styles.header}>
             <TouchableOpacity style={styles.closeButton} onPress={onBack} activeOpacity={0.85}>
               <Text style={styles.closeText}>✕</Text>
@@ -140,7 +135,7 @@ const styles = StyleSheet.create({
   drawerContainer: {
     width: width * 0.8,
     height,
-    backgroundColor: '#000000', // AMOLED Black
+    backgroundColor: '#000000',
     shadowColor: '#000',
     shadowOffset: { width: 5, height: 0 },
     shadowOpacity: 0.2,
@@ -255,4 +250,3 @@ const styles = StyleSheet.create({
   menuTextActive: { color: '#ffffff', fontFamily: 'CabinetGrotesk-Bold' },
   menuTextLogout: { color: '#ff4444' },
 });
-

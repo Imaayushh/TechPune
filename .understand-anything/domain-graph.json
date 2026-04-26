@@ -1,0 +1,170 @@
+{
+  "version": "1.0.0",
+  "project": {
+    "name": "mobile-app",
+    "languages": ["json", "markdown", "typescript"],
+    "frameworks": ["expo", "react", "typescript"],
+    "description": "A React Native Expo application for TechPune with a focus on a professional AMOLED black aesthetic.",
+    "analyzedAt": "2026-04-25T19:10:00Z",
+    "gitCommitHash": "198362bcabda6eaff91bba0c1058b2726950b023"
+  },
+  "nodes": [
+    {
+      "id": "domain:user-authentication",
+      "type": "domain",
+      "name": "User Authentication",
+      "summary": "Handles secure entry into the application through email-based login and OTP verification.",
+      "tags": ["auth", "security", "onboarding"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["User", "OTP", "Session"],
+        "businessRules": ["Require valid email format", "Expire OTP after set time"],
+        "crossDomainInteractions": ["Grants access to Navigation and Dashboard"]
+      }
+    },
+    {
+      "id": "domain:navigation-and-layout",
+      "type": "domain",
+      "name": "Navigation & Layout",
+      "summary": "Manages the global application state for view switching and consistent UI components like the hamburger menu and bottom nav.",
+      "tags": ["navigation", "layout", "ui-ux"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["Route", "Menu", "Tab"],
+        "businessRules": ["Ensure AMOLED black consistency", "Unified icon alignment"],
+        "crossDomainInteractions": ["Routes users between Dashboard, Profile, and Authentication"]
+      }
+    },
+    {
+      "id": "domain:user-profile-management",
+      "type": "domain",
+      "name": "User Profile Management",
+      "summary": "Provides interfaces for users to view and manage their personal information and account settings.",
+      "tags": ["user-profile", "account", "settings"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entities": ["Profile", "User Details"],
+        "businessRules": ["Validation of profile updates"],
+        "crossDomainInteractions": ["Accessed via Navigation side menu"]
+      }
+    },
+    {
+      "id": "flow:user-login",
+      "type": "flow",
+      "name": "User Login",
+      "summary": "The multi-step process of identifying a user and verifying their identity.",
+      "tags": ["auth-flow", "critical-path"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "LoginPage.tsx",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:user-login:enter-email",
+      "type": "step",
+      "name": "Enter Email",
+      "summary": "User provides their email address to initiate the authentication request.",
+      "tags": ["ui-input", "auth-step"],
+      "complexity": "simple",
+      "filePath": "src/LoginPage.tsx"
+    },
+    {
+      "id": "step:user-login:verify-otp",
+      "type": "step",
+      "name": "Verify OTP",
+      "summary": "User enters the one-time password received via email to complete authentication.",
+      "tags": ["verification", "auth-step"],
+      "complexity": "moderate",
+      "filePath": "src/OtpPage.tsx"
+    },
+    {
+      "id": "flow:side-menu-navigation",
+      "type": "flow",
+      "name": "Side Menu Navigation",
+      "summary": "Navigating between major app sections using the global hamburger menu.",
+      "tags": ["nav-flow", "menu-interaction"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "Hamburger.tsx",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:side-menu-navigation:open-hamburger",
+      "type": "step",
+      "name": "Open Hamburger Menu",
+      "summary": "Triggering the side drawer to reveal application links.",
+      "tags": ["ui-interaction", "nav-step"],
+      "complexity": "simple",
+      "filePath": "src/Hamburger.tsx"
+    },
+    {
+      "id": "step:side-menu-navigation:select-view",
+      "type": "step",
+      "name": "Select View",
+      "summary": "Choosing a destination from the menu to update the root application state.",
+      "tags": ["state-update", "nav-step"],
+      "complexity": "moderate",
+      "filePath": "App.tsx"
+    },
+    {
+      "id": "flow:bottom-tab-navigation",
+      "type": "flow",
+      "name": "Bottom Tab Navigation",
+      "summary": "Quickly switching between primary dashboard categories using the bottom navigation bar.",
+      "tags": ["nav-flow", "tab-switching"],
+      "complexity": "simple",
+      "domainMeta": {
+        "entryPoint": "Dashboard.tsx",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:bottom-tab-navigation:switch-tab",
+      "type": "step",
+      "name": "Switch Tab",
+      "summary": "Updating the active tab in the dashboard state to show relevant content.",
+      "tags": ["ui-interaction", "nav-step"],
+      "complexity": "simple",
+      "filePath": "src/Dashboard.tsx"
+    },
+    {
+      "id": "flow:update-profile",
+      "type": "flow",
+      "name": "Update Profile",
+      "summary": "Viewing and modifying user-specific data within the profile screen.",
+      "tags": ["profile-flow", "data-entry"],
+      "complexity": "moderate",
+      "domainMeta": {
+        "entryPoint": "ProfilePage.tsx",
+        "entryType": "manual"
+      }
+    },
+    {
+      "id": "step:update-profile:view-profile",
+      "type": "step",
+      "name": "View Profile",
+      "summary": "Loading and displaying current user details for review or editing.",
+      "tags": ["data-fetch", "profile-step"],
+      "complexity": "moderate",
+      "filePath": "src/ProfilePage.tsx"
+    }
+  ],
+  "edges": [
+    { "source": "domain:user-authentication", "target": "flow:user-login", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:user-login", "target": "step:user-login:enter-email", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:user-login", "target": "step:user-login:verify-otp", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:navigation-and-layout", "target": "flow:side-menu-navigation", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:side-menu-navigation", "target": "step:side-menu-navigation:open-hamburger", "type": "flow_step", "direction": "forward", "weight": 0.5 },
+    { "source": "flow:side-menu-navigation", "target": "step:side-menu-navigation:select-view", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:navigation-and-layout", "target": "flow:bottom-tab-navigation", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:bottom-tab-navigation", "target": "step:bottom-tab-navigation:switch-tab", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:user-profile-management", "target": "flow:update-profile", "type": "contains_flow", "direction": "forward", "weight": 1.0 },
+    { "source": "flow:update-profile", "target": "step:update-profile:view-profile", "type": "flow_step", "direction": "forward", "weight": 1.0 },
+    { "source": "domain:user-authentication", "target": "domain:navigation-and-layout", "type": "cross_domain", "direction": "forward", "description": "Authenticates user to enable app-wide navigation", "weight": 0.8 },
+    { "source": "domain:navigation-and-layout", "target": "domain:user-profile-management", "type": "cross_domain", "direction": "forward", "description": "Provides routing to the profile management area", "weight": 0.6 }
+  ],
+  "layers": [],
+  "tour": []
+}

@@ -28,6 +28,11 @@ To add "soul" to the monochrome palette:
 - **Floating Elements:** Use Glassmorphism for the Floating Action Button (FAB) or Top Navigation. Utilize `surface` at 80% opacity with a `backdrop-filter: blur(20px)`.
 - **Primary Actions:** Use a subtle linear gradient on main CTAs, transitioning from `primary` (#000000) to `primary-container` (#3b3b3b). This adds a "velvet" finish that feels premium and bespoke.
 
+### AMOLED Accents
+**Explicit Instruction:** Use **AMOLED Black** (#000000) for deep structural accents and primary interaction points.
+- **Deep Backgrounds:** For specific high-impact sections (like the sidebar or top header), pure AMOLED black can be used to provide maximum contrast against the white content surfaces.
+- **Micro-Accents:** Use pure black for icons, active navigation labels, and "velvet" buttons to maintain a sharp, premium edge.
+
 ---
 
 ## 3. Typography

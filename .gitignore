@@ -50,3 +50,8 @@ yarn-error.*
 # Web deployments / frameworks
 .vercel
 .next/
+
+# Understand Anything
+.understand-anything/intermediate/
+.understand-anything/tmp/
+.understand-anything/meta.json
