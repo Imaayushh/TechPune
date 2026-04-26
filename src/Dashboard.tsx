@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
@@ -6,6 +6,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Dimensions,
+  Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
@@ -14,141 +15,212 @@ import { BlurView } from 'expo-blur';
 
 const { width } = Dimensions.get('window');
 
+// Reusable Animated Button Wrapper
+const AnimatedPressable = ({ children, onPress, style, activeOpacity = 0.8 }: any) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    Animated.spring(scale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 0,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 0,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={[{ transform: [{ scale }] }, style]}>
+      <TouchableOpacity
+        activeOpacity={activeOpacity}
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        style={{ alignItems: 'center', justifyContent: 'center' }}
+      >
+        {children}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
 export type DashboardProps = {
   onLogout: () => void;
   onProfileClick: () => void;
   onMenuClick: () => void;
+  onNavigate: (screen: string) => void;
   userName?: string;
 };
 
-export default function Dashboard({ onProfileClick, onMenuClick, userName }: DashboardProps) {
+export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, userName }: DashboardProps) {
+  const fadeAnim = useRef(new Animated.Value(0)).current;
+  const slideAnim = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 600,
+        useNativeDriver: true,
+      }),
+      Animated.spring(slideAnim, {
+        toValue: 0,
+        tension: 50,
+        friction: 8,
+        useNativeDriver: true,
+      })
+    ]).start();
+  }, []);
+
+  const renderCard = (children: any, style: any = {}) => (
+    <Animated.View style={[style, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+      {children}
+    </Animated.View>
+  );
+
   return (
     <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity style={styles.headerIcon} onPress={onMenuClick} activeOpacity={0.8}>
-          <Heroicon name="menu-solid" size={22} color="#1a1c1c" />
-        </TouchableOpacity>
+        <AnimatedPressable onPress={onMenuClick} style={styles.headerIcon}>
+          <Heroicon name="menu" size={24} color="#1a1c1c" strokeWidth={2.5} />
+        </AnimatedPressable>
 
         <Text style={styles.logoText}>TechPune</Text>
-        <TouchableOpacity style={styles.headerIcon} onPress={onProfileClick} activeOpacity={0.8}>
+        <AnimatedPressable onPress={onProfileClick} style={styles.headerIcon}>
           <Heroicon name="user-solid" size={22} color="#1a1c1c" />
-        </TouchableOpacity>
+        </AnimatedPressable>
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         {/* Hero Section */}
-        <View style={styles.heroSection}>
+        <Animated.View style={[styles.heroSection, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.welcomeText}>Welcome</Text>
           <Text style={styles.userNameHero}>{userName || 'User'}</Text>
           <Text style={styles.heroDescription}>
             A dedicated Platform for hackathons and daily Updates.
           </Text>
-        </View>
+        </Animated.View>
 
         {/* Active Engagements Section */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Active Engagements</Text>
 
           {/* Hackathon Card */}
-          <View style={styles.activeCard}>
-            <View style={styles.cardHeader}>
-              <View style={styles.badge}>
-                <Text style={styles.badgeText}>HACKATHON</Text>
+          {renderCard(
+            <View style={styles.activeCard}>
+              <View style={styles.cardHeader}>
+                <View style={styles.badge}>
+                  <Text style={styles.badgeText}>HACKATHON</Text>
+                </View>
+                <Text style={styles.timeLeft}>Ends in 3 Days</Text>
               </View>
-              <Text style={styles.timeLeft}>Ends in 3 Days</Text>
-            </View>
-            <Text style={styles.cardMainTitle}>Global AI{'\n'}Summit{'\n'}Challenge</Text>
-            <Text style={styles.cardDescription}>
-              Developing predictive models for sustainable urban infrastructure.
-            </Text>
-            <View style={styles.cardFooter}>
-              <View style={styles.avatars}>
-                <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
-                  <Text style={styles.avatarInitial}>JD</Text>
+              <Text style={styles.cardMainTitle}>Global AI{'\n'}Summit{'\n'}Challenge</Text>
+              <Text style={styles.cardDescription}>
+                Developing predictive models for sustainable urban infrastructure.
+              </Text>
+              <View style={styles.cardFooter}>
+                <View style={styles.avatars}>
+                  <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                    <Text style={styles.avatarInitial}>JD</Text>
+                  </View>
+                  <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
+                    <Text style={styles.avatarInitial}>AS</Text>
+                  </View>
+                  <View style={[styles.avatar, { backgroundColor: '#e2e2e2', marginLeft: -10 }]}>
+                    <Text style={[styles.avatarInitial, { color: '#1a1c1c' }]}>+2</Text>
+                  </View>
                 </View>
-                <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
-                  <Text style={styles.avatarInitial}>AS</Text>
-                </View>
-                <View style={[styles.avatar, { backgroundColor: '#e2e2e2', marginLeft: -10 }]}>
-                  <Text style={[styles.avatarInitial, { color: '#1a1c1c' }]}>+2</Text>
-                </View>
+                <AnimatedPressable>
+                  <Text style={styles.workspaceLink}>Go to Workspace</Text>
+                </AnimatedPressable>
               </View>
-              <TouchableOpacity>
-                <Text style={styles.workspaceLink}>Go to Workspace</Text>
-              </TouchableOpacity>
             </View>
-          </View>
+          )}
 
           {/* Course Card */}
-          <View style={[styles.activeCard, { backgroundColor: '#eeeeee' }]}>
-            <View style={styles.cardHeader}>
-              <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
-                <Text style={styles.badgeText}>COURSE</Text>
+          {renderCard(
+            <View style={[styles.activeCard, { backgroundColor: '#eeeeee' }]}>
+              <View style={styles.cardHeader}>
+                <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                  <Text style={styles.badgeText}>COURSE</Text>
+                </View>
               </View>
-            </View>
-            <Text style={styles.cardMainTitle}>Advanced Data{'\n'}Structures</Text>
-            <View style={styles.progressContainer}>
-              <View style={styles.progressBar}>
-                <View style={[styles.progressFill, { width: '65%' }]} />
+              <Text style={styles.cardMainTitle}>Advanced Data{'\n'}Structures</Text>
+              <View style={styles.progressContainer}>
+                <View style={styles.progressBar}>
+                  <View style={[styles.progressFill, { width: '65%' }]} />
+                </View>
+                <Text style={styles.progressText}>65% Complete</Text>
               </View>
-              <Text style={styles.progressText}>65% Complete</Text>
+              <AnimatedPressable activeOpacity={0.85}>
+                <LinearGradient
+                  colors={['#000000', '#3b3b3b']}
+                  style={styles.resumeButton}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                >
+                  <Text style={styles.resumeButtonText}>Resume Learning  →</Text>
+                </LinearGradient>
+              </AnimatedPressable>
             </View>
-            <TouchableOpacity activeOpacity={0.85}>
-              <LinearGradient
-                colors={['#000000', '#3b3b3b']}
-                style={styles.resumeButton}
-                start={{ x: 0, y: 0 }}
-                end={{ x: 1, y: 1 }}
-              >
-                <Text style={styles.resumeButtonText}>Resume Learning  →</Text>
-              </LinearGradient>
-            </TouchableOpacity>
-          </View>
+          )}
         </View>
 
         {/* Upcoming Recommended Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Upcoming{'\n'}Recommended</Text>
-            <TouchableOpacity>
-              <Text style={styles.viewAll}>View{'\n'}All</Text>
-            </TouchableOpacity>
+            <Text style={styles.sectionTitle}>Upcoming{"\n"}Recommended</Text>
+            <AnimatedPressable>
+              <Text style={styles.viewAll}>View{"\n"}All</Text>
+            </AnimatedPressable>
           </View>
 
           {/* Recommended Item 1 - Internship */}
-          <View style={styles.recommendedItem}>
-            <View style={styles.iconBox}>
-              <Heroicon name="briefcase-solid" size={22} color="#3b3b3b" />
-            </View>
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemTitle}>Product Design Internship</Text>
-              <Text style={styles.itemSubtitle}>TechFlow Studio • San Francisco (Hybrid)</Text>
-              <View style={styles.itemFooter}>
-                <Text style={styles.itemStatus}>Closes in 2 weeks</Text>
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusBadgeText}>High Match</Text>
+          {renderCard(
+            <View style={styles.recommendedItem}>
+              <View style={styles.iconBox}>
+                <Heroicon name="briefcase-solid" size={22} color="#3b3b3b" />
+              </View>
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemTitle}>Product Design Internship</Text>
+                <Text style={styles.itemSubtitle}>TechFlow Studio • San Francisco (Hybrid)</Text>
+                <View style={styles.itemFooter}>
+                  <Text style={styles.itemStatus}>Closes in 2 weeks</Text>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.statusBadgeText}>High Match</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          )}
 
           {/* Recommended Item 2 - Webinar */}
-          <View style={styles.recommendedItem}>
-            <View style={styles.iconBox}>
-              <Heroicon name="clipboard-document-solid" size={22} color="#3b3b3b" />
-            </View>
-            <View style={styles.itemInfo}>
-              <Text style={styles.itemTitle}>The Future of Spatial Computing</Text>
-              <Text style={styles.itemSubtitle}>Webinar • Hosted by Nexus XR</Text>
-              <View style={styles.itemFooter}>
-                <Text style={styles.itemStatus}>Tomorrow, 10:00 AM</Text>
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusBadgeText}>Design Track</Text>
+          {renderCard(
+            <View style={styles.recommendedItem}>
+              <View style={styles.iconBox}>
+                <Heroicon name="clipboard-document-solid" size={22} color="#3b3b3b" />
+              </View>
+              <View style={styles.itemInfo}>
+                <Text style={styles.itemTitle}>The Future of Spatial Computing</Text>
+                <Text style={styles.itemSubtitle}>Webinar • Hosted by Nexus XR</Text>
+                <View style={styles.itemFooter}>
+                  <Text style={styles.itemStatus}>Tomorrow, 10:00 AM</Text>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.statusBadgeText}>Design Track</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
+          )}
         </View>
 
         {/* Spacer for bottom nav */}
@@ -157,35 +229,35 @@ export default function Dashboard({ onProfileClick, onMenuClick, userName }: Das
 
       {/* Bottom Navigation */}
       <View style={styles.bottomNavContainer}>
-        <BlurView intensity={80} tint="light" style={styles.bottomNavBlur}>
+        <BlurView intensity={100} tint="light" style={styles.bottomNavBlur}>
           <View style={styles.bottomNav}>
-            <TouchableOpacity style={styles.navItemContainer}>
+            <AnimatedPressable onPress={() => onNavigate('dashboard')} style={styles.navItemContainer}>
               <View style={styles.navIconContainerActive}>
-                <Heroicon name="squares-2x2-solid" size={20} color="#ffffff" />
+                <Heroicon name="home-solid" size={22} color="#ffffff" />
               </View>
               <Text style={styles.navLabelActive}>DASHBOARD</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <TouchableOpacity style={styles.navItemContainer}>
+            <AnimatedPressable onPress={() => onNavigate('hackathons')} style={styles.navItemContainer}>
               <View style={styles.navIconContainer}>
-                <Heroicon name="terminal" size={20} color="#000000" />
+                <Heroicon name="terminal-solid" size={22} color="#3b3b3b" />
               </View>
               <Text style={styles.navLabel}>HACKATHONS</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <TouchableOpacity style={styles.navItemContainer}>
+            <AnimatedPressable onPress={() => onNavigate('news')} style={styles.navItemContainer}>
               <View style={styles.navIconContainer}>
-                <Heroicon name="document" size={20} color="#000000" />
+                <Heroicon name="bell-solid" size={22} color="#3b3b3b" />
               </View>
               <Text style={styles.navLabel}>NEWS</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
 
-            <TouchableOpacity style={styles.navItemContainer}>
+            <AnimatedPressable onPress={() => onNavigate('courses')} style={styles.navItemContainer}>
               <View style={styles.navIconContainer}>
-                <Heroicon name="academic-cap" size={20} color="#000000" />
+                <Heroicon name="book-open-solid" size={22} color="#3b3b3b" />
               </View>
               <Text style={styles.navLabel}>COURSES</Text>
-            </TouchableOpacity>
+            </AnimatedPressable>
           </View>
         </BlurView>
       </View>
@@ -316,6 +388,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
+    paddingTop: 12,
   },
   avatars: {
     flexDirection: 'row',
@@ -426,10 +499,10 @@ const styles = StyleSheet.create({
     right: 20,
     alignItems: 'center',
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 20 },
-    shadowOpacity: 0.05,
-    shadowRadius: 40,
-    elevation: 0,
+    shadowOffset: { width: 0, height: 15 },
+    shadowOpacity: 0.22,
+    shadowRadius: 28,
+    elevation: 12,
   },
   bottomNavBlur: {
     width: '100%',
@@ -438,12 +511,14 @@ const styles = StyleSheet.create({
   },
   bottomNav: {
     flexDirection: 'row',
-    backgroundColor: 'rgba(249, 249, 249, 0.75)',
+    backgroundColor: 'rgba(255, 255, 255, 0.98)',
     width: '100%',
-    height: 85,
+    height: 74,
     justifyContent: 'space-around',
     alignItems: 'center',
-    paddingHorizontal: 15,
+    paddingHorizontal: 10,
+    borderWidth: 1,
+    borderColor: 'rgba(0, 0, 0, 0.05)',
   },
   navItemContainer: {
     flex: 1,
@@ -451,20 +526,20 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   navIconContainer: {
-    width: 48,
-    height: 48,
+    width: 42,
+    height: 42,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   navIconContainerActive: {
-    width: 48,
-    height: 48,
-    backgroundColor: '#000000',
-    borderRadius: 14,
+    width: 42,
+    height: 42,
+    backgroundColor: '#1a1c1c',
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   navLabel: {
     fontSize: 10,
@@ -480,4 +555,3 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Semibold',
   },
 });
-
