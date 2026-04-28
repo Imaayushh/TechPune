@@ -10,7 +10,7 @@ import {
   Alert,
   Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
 
 const { width, height } = Dimensions.get('window');
@@ -93,6 +93,7 @@ export default function Hamburger({
   userEmail, 
   userName 
 }: HamburgerProps) {
+  const insets = useSafeAreaInsets();
   const slideAnim = useRef(new Animated.Value(-width * 0.8)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
@@ -274,9 +275,6 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 20,
   },
-  safeArea: {
-    flex: 1,
-  },
   header: {
     paddingHorizontal: 24,
     paddingTop: 32,
@@ -410,3 +408,5 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
 });
+
+

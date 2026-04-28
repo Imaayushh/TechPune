@@ -11,7 +11,7 @@ import {
   NativeSyntheticEvent,
   TextInputKeyPressEventData,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export type OtpPageProps = {
   email: string;
@@ -24,6 +24,7 @@ export default function OtpPage({ email, onVerify, onBack }: OtpPageProps) {
   const [error, setError] = useState('');
   const [sendStatus, setSendStatus] = useState('');
   const inputRefs = useRef<Array<TextInput | null>>([]);
+  const insets = useSafeAreaInsets();
 
   const handleChange = (value: string, index: number) => {
     const newOtp = [...otp];
@@ -60,9 +61,12 @@ export default function OtpPage({ email, onVerify, onBack }: OtpPageProps) {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : 'height'} style={styles.container}>
-        <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        <ScrollView 
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: 28 + insets.bottom }]} 
+          showsVerticalScrollIndicator={false}
+        >
           <Text style={styles.title}>Verification</Text>
           <Text style={styles.subtitle}>Enter the 6-digit code sent to</Text>
           <Text style={styles.emailText}>{email}</Text>
@@ -136,4 +140,5 @@ const styles = StyleSheet.create({
   actionsRow: { marginTop: 16, flexDirection: 'row', justifyContent: 'space-between' },
   linkText: { color: '#1a1c1c', textDecorationLine: 'underline', fontFamily: 'Inter-Medium' },
 });
+
 

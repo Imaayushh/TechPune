@@ -8,7 +8,7 @@ import {
   Dimensions,
   Animated,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
 import { LinearGradient } from 'expo-linear-gradient';
 import { BlurView } from 'expo-blur';
@@ -61,6 +61,7 @@ export type DashboardProps = {
 };
 
 export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, userName }: DashboardProps) {
+  const insets = useSafeAreaInsets();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
 
@@ -87,7 +88,7 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
   );
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
       {/* Header */}
       <View style={styles.header}>
         <AnimatedPressable onPress={onMenuClick} style={styles.headerIcon}>
@@ -228,7 +229,7 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
       </ScrollView>
 
       {/* Bottom Navigation */}
-      <View style={styles.bottomNavContainer}>
+      <View style={[styles.bottomNavContainer, { bottom: 20 + insets.bottom }]}>
         <BlurView intensity={100} tint="light" style={styles.bottomNavBlur}>
           <View style={styles.bottomNav}>
             <AnimatedPressable onPress={() => onNavigate('dashboard')} style={styles.navItemContainer}>
@@ -261,7 +262,7 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
           </View>
         </BlurView>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 
@@ -494,7 +495,6 @@ const styles = StyleSheet.create({
   },
   bottomNavContainer: {
     position: 'absolute',
-    bottom: 20,
     left: 20,
     right: 20,
     alignItems: 'center',
@@ -555,3 +555,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Semibold',
   },
 });
+
+

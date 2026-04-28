@@ -10,7 +10,7 @@ import {
   Platform,
   Alert,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
 
 type LoginPageProps = {
@@ -20,17 +20,18 @@ type LoginPageProps = {
 
 export default function LoginPage({ onSignIn, onTermsPress }: LoginPageProps) {
   const [email, setEmail] = useState('');
+  const insets = useSafeAreaInsets();
 
   const canSubmit = useMemo(() => email.trim().length > 0, [email]);
 
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
       <KeyboardAvoidingView
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         style={styles.container}
       >
         <ScrollView
-          contentContainerStyle={styles.scrollContent}
+          contentContainerStyle={[styles.scrollContent, { paddingBottom: 28 + insets.bottom }]}
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
@@ -125,7 +126,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 22,
     paddingVertical: 28,
-    backgroundColor: '#f9f9f9',
   },
   brandBlock: {
     alignItems: 'center',
@@ -246,4 +246,5 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
 });
+
 

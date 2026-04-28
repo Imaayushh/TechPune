@@ -14,53 +14,6 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { LinearGradient } from 'expo-linear-gradient';
-import { BlurView } from 'expo-blur';
-import { Heroicon } from './Heroicon';
-
-const { width, height } = Dimensions.get('window');
-
-// Reusable Animated Button Wrapper
-const AnimatedPressable = ({ children, onPress, style, activeOpacity = 0.8 }: any) => {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const handlePressIn = () => {
-    Animated.spring(scale, {
-      toValue: 0.96,
-      useNativeDriver: true,
-      speed: 20,
-      bounciness: 0,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 20,
-      bounciness: 0,
-    }).start();
-  };
-
-  return (
-    <Animated.View style={[{ transform: [{ scale }] }, style]}>
-      <TouchableOpacity
-        activeOpacity={activeOpacity}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={{ 
-          flexDirection: 'row', 
-          alignItems: 'center', 
-          justifyContent: 'center',
-          gap: 8
-        }}
-      >
-        {children}
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
 
 export type ProfilePageProps = {
   onBack: () => void;
@@ -75,9 +28,11 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
   const [isSaving, setIsSaving] = useState(false);
   const [originalInfo, setOriginalInfo] = useState<any>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const [personalInfo, setPersonalInfo] = useState({
-    fullName: userName || 'Admin User',
+  const [isEditing, setIsEditing] = useState(false);
+  const [nameError, setNameError] = useState(false);
+
+  const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
+    fullName: userName,
     email: userEmail || 'admin@techpune.com',
     mobile: '+91 9876543210',
     address: '123 Tech Park, Pune, Maharashtra',
@@ -180,12 +135,12 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.stickyHeader}>
-        <AnimatedPressable onPress={onBack} style={styles.iconBtn}>
-          <Heroicon name="chevron-left" size={22} color="#1a1c1c" />
-        </AnimatedPressable>
-        <Text style={styles.stickyTitle}>USER PROFILE</Text>
-        <View style={{ width: 40 }} />
+      <View style={styles.header}>
+        <TouchableOpacity onPress={onBack} style={styles.headerIcon} activeOpacity={0.8}>
+          <Text style={styles.headerIconText}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>PROFILE</Text>
+        <View style={styles.headerIcon} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollBody}>
@@ -210,16 +165,11 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
               </View>
             </AnimatedPressable>
           </View>
-          {isEditing ? (
-            <TextInput
-              style={styles.nameInput}
-              value={personalInfo.fullName}
-              onChangeText={(text) => setPersonalInfo({ ...personalInfo, fullName: text })}
-              textAlign="center"
-            />
-          ) : (
+
+          <View style={styles.userInfoTop}>
             <Text style={styles.userNameText}>{personalInfo.fullName}</Text>
-          )}
+            <Text style={styles.userEmailText}>{personalInfo.email}</Text>
+          </View>
         </View>
 
         {/* Account Details Section */}
@@ -366,19 +316,20 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
             </AnimatedPressable>
           </View>
         </View>
-      </Modal>
 
-      {/* Footer Button */}
-      <View style={styles.fixedFooter}>
-        <BlurView intensity={90} tint="light" style={styles.footerBlur}>
-          <AnimatedPressable 
-            style={styles.primaryBtn} 
-            onPress={onContinue}
-          >
-            <Text style={styles.btnText}>Proceed to Dashboard</Text>
-            <Heroicon name="chevron-right" size={18} color="#ffffff" />
-          </AnimatedPressable>
-        </BlurView>
+        <View style={{ height: 40 }} />
+      </ScrollView>
+
+      {/* Continue Button */}
+      <View style={styles.continueContainer}>
+        <TouchableOpacity
+          style={[styles.continueButton, !personalInfo.fullName.trim() && styles.continueButtonDisabled]}
+          onPress={handleContinue}
+          disabled={!personalInfo.fullName.trim()}
+          activeOpacity={0.85}
+        >
+          <Text style={styles.continueButtonText}>Continue →</Text>
+        </TouchableOpacity>
       </View>
     </SafeAreaView>
   );
@@ -393,11 +344,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 16,
-    height: 64,
-    backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    paddingHorizontal: 20,
+    paddingTop: 8,
+    paddingBottom: 12,
+    backgroundColor: '#f9f9f9',
   },
   iconBtn: {
     width: 40,
@@ -668,10 +618,10 @@ const styles = StyleSheet.create({
   },
   footerBlur: {
     paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 40,
+    paddingVertical: 16,
+    backgroundColor: '#f9f9f9',
     borderTopWidth: 1,
-    borderTopColor: '#f0f0f0',
+    borderTopColor: '#eeeeee',
   },
   primaryBtn: {
     height: 58,
@@ -687,8 +637,4 @@ const styles = StyleSheet.create({
     color: '#ffffff',
   },
 });
-
-
-
-
 
