@@ -275,6 +275,9 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 20,
   },
+  safeArea: {
+    flex: 1,
+  },
   header: {
     paddingHorizontal: 24,
     paddingTop: 32,

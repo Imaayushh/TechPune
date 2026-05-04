@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
@@ -58,10 +58,12 @@ export type DashboardProps = {
   onMenuClick: () => void;
   onNavigate: (screen: string) => void;
   userName?: string;
+  isProfileComplete?: boolean;
 };
 
-export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, userName }: DashboardProps) {
+export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, userName, isProfileComplete }: DashboardProps) {
   const insets = useSafeAreaInsets();
+  const [showPrompt, setShowPrompt] = useState(!isProfileComplete);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
 
@@ -88,7 +90,7 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
   );
 
   return (
-    <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+    <SafeAreaView style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
         <AnimatedPressable onPress={onMenuClick} style={styles.headerIcon}>
@@ -102,6 +104,46 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
       </View>
 
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
+        {/* Registration Prompt */}
+        {showPrompt && !isProfileComplete && (
+          <Animated.View style={[styles.promptContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
+            <LinearGradient
+              colors={['#1a1c1c', '#333333']}
+              style={styles.promptGradient}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+            >
+              <View style={styles.promptContent}>
+                <View style={styles.promptIconCircle}>
+                  <Heroicon name="user-solid" size={20} color="#000" />
+                </View>
+                <View style={styles.promptTextContainer}>
+                  <Text style={styles.promptText}>
+                    Complete your User Registration to access the platform.
+                  </Text>
+                </View>
+              </View>
+              <View style={styles.promptActions}>
+                <TouchableOpacity 
+                  style={styles.cancelBtn} 
+                  onPress={() => setShowPrompt(false)}
+                >
+                  <Text style={styles.cancelBtnText}>Cancel</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.completeBtn} 
+                  onPress={() => {
+                    setShowPrompt(false);
+                    onProfileClick();
+                  }}
+                >
+                  <Text style={styles.completeBtnText}>Complete</Text>
+                </TouchableOpacity>
+              </View>
+            </LinearGradient>
+          </Animated.View>
+        )}
+
         {/* Hero Section */}
         <Animated.View style={[styles.heroSection, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
           <Text style={styles.welcomeText}>Welcome</Text>
@@ -262,7 +304,7 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
           </View>
         </BlurView>
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -553,6 +595,69 @@ const styles = StyleSheet.create({
     color: '#000000',
     letterSpacing: 0.5,
     fontFamily: 'Inter-Semibold',
+  },
+  promptContainer: {
+    marginBottom: 20,
+    borderRadius: 24,
+    overflow: 'hidden',
+    elevation: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.15,
+    shadowRadius: 20,
+  },
+  promptGradient: {
+    padding: 20,
+  },
+  promptContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  promptIconCircle: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 14,
+  },
+  promptTextContainer: {
+    flex: 1,
+  },
+  promptText: {
+    color: '#ffffff',
+    fontSize: 15,
+    fontFamily: 'Inter-Medium',
+    lineHeight: 20,
+  },
+  promptActions: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 12,
+  },
+  cancelBtn: {
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+  },
+  cancelBtnText: {
+    color: '#ffffff',
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+  },
+  completeBtn: {
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 12,
+    backgroundColor: '#ffffff',
+  },
+  completeBtnText: {
+    color: '#000000',
+    fontSize: 14,
+    fontFamily: 'Inter-Bold',
   },
 });
 

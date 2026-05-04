@@ -14,6 +14,8 @@ import {
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Heroicon } from './Heroicon';
+import { BlurView } from 'expo-blur';
 
 export type ProfilePageProps = {
   onBack: () => void;
@@ -21,22 +23,85 @@ export type ProfilePageProps = {
   userEmail?: string;
   userName?: string;
   onUpdateName?: (name: string) => void;
+  onProfileComplete?: () => void;
+  userMobile?: string;
+  userAddress?: string;
+  userDob?: string;
+  onUpdateProfile?: (data: PersonalInfo) => void;
 };
 
-export default function ProfilePage({ onBack, onContinue, userEmail, userName, onUpdateName }: ProfilePageProps) {
+type PersonalInfo = {
+  fullName: string;
+  email: string;
+  mobile: string;
+  address: string;
+  dob: string;
+};
+
+// Reusable Animated Button Wrapper
+const AnimatedPressable = ({ children, onPress, style, activeOpacity = 0.8, disabled }: any) => {
+  const scale = useRef(new Animated.Value(1)).current;
+
+  const handlePressIn = () => {
+    if (disabled) return;
+    Animated.spring(scale, {
+      toValue: 0.96,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 0,
+    }).start();
+  };
+
+  const handlePressOut = () => {
+    if (disabled) return;
+    Animated.spring(scale, {
+      toValue: 1,
+      useNativeDriver: true,
+      speed: 20,
+      bounciness: 0,
+    }).start();
+  };
+
+  return (
+    <Animated.View style={[{ transform: [{ scale }] }, style]}>
+      <TouchableOpacity
+        activeOpacity={activeOpacity}
+        onPress={disabled ? undefined : onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
+        disabled={disabled}
+      >
+        {children}
+      </TouchableOpacity>
+    </Animated.View>
+  );
+};
+
+export default function ProfilePage({ 
+  onBack, 
+  onContinue, 
+  userEmail, 
+  userName, 
+  onUpdateName, 
+  onProfileComplete,
+  userMobile,
+  userAddress,
+  userDob,
+  onUpdateProfile
+}: ProfilePageProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [originalInfo, setOriginalInfo] = useState<any>(null);
   const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [isEditing, setIsEditing] = useState(false);
   const [nameError, setNameError] = useState(false);
+  const [showDatePicker, setShowDatePicker] = useState(false);
 
   const [personalInfo, setPersonalInfo] = useState<PersonalInfo>({
-    fullName: userName,
-    email: userEmail || 'admin@techpune.com',
-    mobile: '+91 9876543210',
-    address: '123 Tech Park, Pune, Maharashtra',
-    dob: '15 Aug 1995',
+    fullName: userName || '',
+    email: userEmail || '',
+    mobile: userMobile || '',
+    address: userAddress || '',
+    dob: userDob || '',
   });
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -51,16 +116,32 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
 
   const validate = () => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!personalInfo.fullName.trim()) {
+      Alert.alert('Required Field', 'Full Name is mandatory.');
+      return false;
+    }
+    if (!personalInfo.email.trim()) {
+      Alert.alert('Required Field', 'Email is mandatory.');
+      return false;
+    }
     if (!emailRegex.test(personalInfo.email)) {
       Alert.alert('Invalid Email', 'Please enter a valid email address.');
+      return false;
+    }
+    if (!personalInfo.mobile.trim()) {
+      Alert.alert('Required Field', 'Mobile Number is mandatory.');
       return false;
     }
     if (personalInfo.mobile.length < 10) {
       Alert.alert('Invalid Mobile', 'Mobile number should be at least 10 digits.');
       return false;
     }
-    if (!personalInfo.fullName.trim()) {
-      Alert.alert('Required Field', 'Full Name cannot be empty.');
+    if (!personalInfo.dob.trim()) {
+      Alert.alert('Required Field', 'Date of Birth is mandatory.');
+      return false;
+    }
+    if (!personalInfo.address.trim()) {
+      Alert.alert('Required Field', 'Address is mandatory.');
       return false;
     }
     return true;
@@ -75,6 +156,8 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
         setIsSaving(true);
         setTimeout(() => {
           if (onUpdateName) onUpdateName(personalInfo.fullName);
+          if (onUpdateProfile) onUpdateProfile(personalInfo);
+          if (onProfileComplete) onProfileComplete();
           setIsSaving(false);
           setIsEditing(false);
           Alert.alert('Profile Updated', 'Your changes have been saved successfully.');
@@ -101,6 +184,27 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
   const handleDateSelect = (day: number, month: string, year: number) => {
     setPersonalInfo({ ...personalInfo, dob: `${day} ${month} ${year}` });
     setShowDatePicker(false);
+  };
+
+  const handleContinue = () => {
+    if (isEditing) {
+      if (validate()) {
+        setIsSaving(true);
+        setTimeout(() => {
+          if (onUpdateName) onUpdateName(personalInfo.fullName);
+          if (onUpdateProfile) onUpdateProfile(personalInfo);
+          if (onProfileComplete) onProfileComplete();
+          setIsSaving(false);
+          setIsEditing(false);
+          if (onContinue) onContinue();
+        }, 1000);
+      }
+    } else {
+      // Even if not in 'editing' mode, ensure we validate before continuing
+      if (validate()) {
+        if (onContinue) onContinue();
+      }
+    }
   };
 
   const renderDetailRow = (icon: any, label: string, value: string, key: string, isLast = false) => (
@@ -136,11 +240,11 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.headerIcon} activeOpacity={0.8}>
-          <Text style={styles.headerIconText}>←</Text>
+        <TouchableOpacity onPress={onBack} style={styles.headerIcon} activeOpacity={0.7}>
+          <Heroicon name="chevron-left" size={24} color="#1a1c1c" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>PROFILE</Text>
-        <View style={styles.headerIcon} />
+        <View style={{ width: 44 }} />
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scrollBody}>
@@ -308,17 +412,16 @@ export default function ProfilePage({ onBack, onContinue, userEmail, userName, o
               </View>
             </View>
 
-            <AnimatedPressable
+            <TouchableOpacity
               style={styles.confirmBtn}
               onPress={() => setShowDatePicker(false)}
+              activeOpacity={0.8}
             >
               <Text style={styles.confirmBtnText}>Confirm Date</Text>
-            </AnimatedPressable>
+            </TouchableOpacity>
           </View>
         </View>
-
-        <View style={{ height: 40 }} />
-      </ScrollView>
+      </Modal>
 
       {/* Continue Button */}
       <View style={styles.continueContainer}>
@@ -339,6 +442,34 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fcfcfc',
+  },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+    paddingBottom: 16,
+  },
+  headerIcon: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
+  },
+  headerIconText: {
+    fontSize: 20,
+    color: '#1a1c1c',
+  },
+  headerTitle: {
+    fontSize: 16,
+    fontFamily: 'ClashDisplay-Bold',
+    color: '#1a1c1c',
+    letterSpacing: 1,
   },
   stickyHeader: {
     flexDirection: 'row',
@@ -419,10 +550,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     elevation: 4,
   },
+  userInfoTop: {
+    alignItems: 'center',
+    marginBottom: 24,
+  },
   userNameText: {
     fontSize: 28,
     fontFamily: 'ClashDisplay-Bold',
     color: '#1a1c1c',
+  },
+  userEmailText: {
+    fontSize: 14,
+    fontFamily: 'Inter-Medium',
+    color: '#9a9a9a',
+    marginTop: 4,
   },
   nameInput: {
     fontSize: 28,
@@ -539,7 +680,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 32,
     paddingTop: 12,
     paddingHorizontal: 24,
-    paddingBottom: 40,
+    paddingBottom: 50,
   },
   sheetHandle: {
     width: 40,
@@ -604,6 +745,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 8,
     elevation: 4,
+    zIndex: 10,
   },
   confirmBtnText: {
     fontSize: 16,
@@ -635,6 +777,27 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontFamily: 'Inter-Bold',
     color: '#ffffff',
+  },
+  continueContainer: {
+    padding: 20,
+    backgroundColor: '#f9f9f9',
+    borderTopWidth: 1,
+    borderTopColor: '#eeeeee',
+  },
+  continueButton: {
+    height: 58,
+    borderRadius: 999,
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  continueButtonDisabled: {
+    opacity: 0.5,
+  },
+  continueButtonText: {
+    color: '#ffffff',
+    fontSize: 16,
+    fontFamily: 'Inter-Semibold',
   },
 });
 

@@ -17,9 +17,8 @@ import Hackathons from './src/Hackathons';
 import News from './src/News';
 import Courses from './src/Courses';
 import TermsAndConditions from './src/TermsAndConditions';
-import OnboardingPage from './src/OnboardingPage';
 
-type ViewKey = 'login' | 'onboarding' | 'dashboard' | 'profile' | 'settings' | 'changePassword' | 'securityPrivacy' | 'notifications' | 'hackathons' | 'news' | 'courses' | 'terms';
+type ViewKey = 'login' | 'dashboard' | 'profile' | 'settings' | 'changePassword' | 'securityPrivacy' | 'notifications' | 'hackathons' | 'news' | 'courses' | 'terms';
 
 export default function App() {
   const [view, setView] = useState<ViewKey>('login');
@@ -28,6 +27,10 @@ export default function App() {
   const [userName, setUserName] = useState('');
   const [userCollege, setUserCollege] = useState('');
   const [userYear, setUserYear] = useState('');
+  const [userMobile, setUserMobile] = useState('');
+  const [userAddress, setUserAddress] = useState('');
+  const [userDob, setUserDob] = useState('');
+  const [isProfileComplete, setIsProfileComplete] = useState(false);
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(10)).current;
@@ -60,12 +63,8 @@ export default function App() {
 
   if (!fontsLoaded) return null;
 
-  const handleSignIn = (userEmail: string) => {
-    setEmail(userEmail);
-    setView('onboarding');
-  };
-
-  const handleOnboardingComplete = (data: any) => {
+  const handleLoginComplete = (data: { email: string, name: string, college: string, year: string }) => {
+    setEmail(data.email);
     setUserName(data.name);
     setUserCollege(data.college);
     setUserYear(data.year);
@@ -85,10 +84,7 @@ export default function App() {
               onMenuClick={() => setIsMenuVisible(true)}
               onNavigate={(screen) => setView(screen as ViewKey)}
               userName={userName}
-            />
-          ) : view === 'onboarding' ? (
-            <OnboardingPage
-              onComplete={handleOnboardingComplete}
+              isProfileComplete={isProfileComplete}
             />
           ) : view === 'profile' ? (
             <ProfilePage 
@@ -97,6 +93,16 @@ export default function App() {
               onContinue={() => setView('dashboard')}
               userName={userName}
               onUpdateName={setUserName}
+              onProfileComplete={() => setIsProfileComplete(true)}
+              userMobile={userMobile}
+              userAddress={userAddress}
+              userDob={userDob}
+              onUpdateProfile={(data) => {
+                setUserName(data.fullName);
+                setUserMobile(data.mobile);
+                setUserAddress(data.address);
+                setUserDob(data.dob);
+              }}
             />
           ) : view === 'settings' ? (
             <AccountSettings 
@@ -122,7 +128,7 @@ export default function App() {
             />
           ) : (
             <LoginPage 
-              onSignIn={handleSignIn}
+              onComplete={handleLoginComplete}
               onTermsPress={() => setView('terms')}
             />
           )}
