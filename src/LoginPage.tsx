@@ -525,8 +525,7 @@ const styles = StyleSheet.create({
   },
   pickerItem: {
     paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f5f5f7',
+    // No-Line Rule: Removed border
   },
   pickerItemText: {
     fontSize: 16,

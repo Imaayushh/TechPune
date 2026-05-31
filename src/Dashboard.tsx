@@ -7,6 +7,8 @@ import {
   ScrollView,
   Dimensions,
   Animated,
+  TouchableWithoutFeedback,
+  Easing,
 } from 'react-native';
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
@@ -64,8 +66,21 @@ export type DashboardProps = {
 export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, userName, isProfileComplete }: DashboardProps) {
   const insets = useSafeAreaInsets();
   const [showPrompt, setShowPrompt] = useState(!isProfileComplete);
+  const [isFabOpen, setIsFabOpen] = useState(false);
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
+  const fabAnim = useRef(new Animated.Value(0)).current;
+
+  const toggleFab = () => {
+    const toValue = isFabOpen ? 0 : 1;
+    setIsFabOpen(!isFabOpen);
+    Animated.timing(fabAnim, {
+      toValue,
+      duration: 500,
+      easing: Easing.bezier(0.4, 0, 0.2, 1),
+      useNativeDriver: true,
+    }).start();
+  };
 
   useEffect(() => {
     Animated.parallel([
@@ -153,78 +168,346 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
           </Text>
         </Animated.View>
 
-        {/* Active Engagements Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Active Engagements</Text>
-
-          {/* Hackathon Card */}
-          {renderCard(
-            <View style={styles.activeCard}>
-              <View style={styles.cardHeader}>
-                <View style={styles.badge}>
-                  <Text style={styles.badgeText}>HACKATHON</Text>
-                </View>
-                <Text style={styles.timeLeft}>Ends in 3 Days</Text>
-              </View>
-              <Text style={styles.cardMainTitle}>Global AI{'\n'}Summit{'\n'}Challenge</Text>
-              <Text style={styles.cardDescription}>
-                Developing predictive models for sustainable urban infrastructure.
-              </Text>
-              <View style={styles.cardFooter}>
-                <View style={styles.avatars}>
-                  <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
-                    <Text style={styles.avatarInitial}>JD</Text>
-                  </View>
-                  <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
-                    <Text style={styles.avatarInitial}>AS</Text>
-                  </View>
-                  <View style={[styles.avatar, { backgroundColor: '#e2e2e2', marginLeft: -10 }]}>
-                    <Text style={[styles.avatarInitial, { color: '#1a1c1c' }]}>+2</Text>
-                  </View>
-                </View>
-                <AnimatedPressable>
-                  <Text style={styles.workspaceLink}>Go to Workspace</Text>
-                </AnimatedPressable>
-              </View>
-            </View>
-          )}
-
-          {/* Course Card */}
-          {renderCard(
-            <View style={[styles.activeCard, { backgroundColor: '#eeeeee' }]}>
-              <View style={styles.cardHeader}>
-                <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
-                  <Text style={styles.badgeText}>COURSE</Text>
-                </View>
-              </View>
-              <Text style={styles.cardMainTitle}>Advanced Data{'\n'}Structures</Text>
-              <View style={styles.progressContainer}>
-                <View style={styles.progressBar}>
-                  <View style={[styles.progressFill, { width: '65%' }]} />
-                </View>
-                <Text style={styles.progressText}>65% Complete</Text>
-              </View>
-              <AnimatedPressable activeOpacity={0.85}>
-                <LinearGradient
-                  colors={['#000000', '#3b3b3b']}
-                  style={styles.resumeButton}
-                  start={{ x: 0, y: 0 }}
-                  end={{ x: 1, y: 1 }}
-                >
-                  <Text style={styles.resumeButtonText}>Resume Learning  →</Text>
-                </LinearGradient>
-              </AnimatedPressable>
-            </View>
-          )}
-        </View>
-
-        {/* Upcoming Recommended Section */}
+        {/* Ongoing Events Section */}
         <View style={styles.section}>
           <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>Upcoming{"\n"}Recommended</Text>
-            <AnimatedPressable>
-              <Text style={styles.viewAll}>View{"\n"}All</Text>
+            <Text style={styles.sectionTitle}>Ongoing Events</Text>
+            <AnimatedPressable onPress={() => onNavigate('hackathons')}>
+              <Text style={styles.viewAll}>View All</Text>
             </AnimatedPressable>
+          </View>
+
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.horizontalScroll}
+            decelerationRate="fast"
+            snapToInterval={width - 40 + 16}
+            snapToAlignment="start"
+            disableIntervalMomentum={true}
+          >
+            {/* Hackathon Card 1 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#f5f5f7' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>HACKATHON</Text>
+                  </View>
+                  <Text style={styles.timeLeft}>Ends in 3 Days</Text>
+                </View>
+                <Text style={styles.cardMainTitle}>Global AI{'\n'}Summit{'\n'}Challenge</Text>
+                <Text style={styles.cardDescription}>
+                  Developing predictive models for sustainable urban infrastructure.
+                </Text>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                      <Text style={styles.avatarInitial}>JD</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
+                      <Text style={styles.avatarInitial}>AS</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#e2e2e2', marginLeft: -10 }]}>
+                      <Text style={[styles.avatarInitial, { color: '#1a1c1c' }]}>+2</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('hackathons')} style={{ width: '100%', marginTop: 16 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+
+            {/* Hackathon Card 2 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#eeeeee' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>HACKATHON</Text>
+                  </View>
+                  <Text style={styles.timeLeft}>Starts Tomorrow</Text>
+                </View>
+                <Text style={styles.cardMainTitle}>Web3 Identity{'\n'}Privacy{'\n'}Sprint</Text>
+                <Text style={styles.cardDescription}>
+                  Innovating zero-knowledge proofs for decentralized identification.
+                </Text>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#4a4c4c' }]}>
+                      <Text style={styles.avatarInitial}>MK</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#7a7a7a', marginLeft: -10 }]}>
+                      <Text style={styles.avatarInitial}>TR</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('hackathons')} style={{ width: '100%', marginTop: 16 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+
+            {/* Hackathon Card 3 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#e2e2e2' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>HACKATHON</Text>
+                  </View>
+                  <Text style={styles.timeLeft}>Ends in 5 Days</Text>
+                </View>
+                <Text style={styles.cardMainTitle}>AI for{'\n'}Healthcare{'\n'}Summit</Text>
+                <Text style={styles.cardDescription}>
+                  Building diagnostics tools powered by neural networks.
+                </Text>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                      <Text style={styles.avatarInitial}>RN</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#5f5e5e', marginLeft: -10 }]}>
+                      <Text style={styles.avatarInitial}>PL</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('hackathons')} style={{ width: '100%', marginTop: 16 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+
+            {/* Hackathon Card 4 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#d6d4d3' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>HACKATHON</Text>
+                  </View>
+                  <Text style={styles.timeLeft}>Ends in 1 Week</Text>
+                </View>
+                <Text style={styles.cardMainTitle}>Eco-Tech{'\n'}Innovation{'\n'}Challenge</Text>
+                <Text style={styles.cardDescription}>
+                  Green energy solutions for local urban power grids.
+                </Text>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#333333' }]}>
+                      <Text style={styles.avatarInitial}>GM</Text>
+                    </View>
+                  </View>
+                </View>
+
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('hackathons')} style={{ width: '100%', marginTop: 16 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+
+        {/* Ongoing Courses Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Courses</Text>
+            <AnimatedPressable onPress={() => onNavigate('courses')}>
+              <Text style={styles.viewAll}>View All</Text>
+            </AnimatedPressable>
+          </View>
+          <ScrollView 
+            horizontal 
+            showsHorizontalScrollIndicator={false} 
+            contentContainerStyle={styles.horizontalScroll}
+            decelerationRate="fast"
+            snapToInterval={width - 40 + 16}
+            snapToAlignment="start"
+            disableIntervalMomentum={true}
+          >
+            {/* Course Card 1 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#f5f5f7' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>COURSE</Text>
+                  </View>
+                </View>
+                <Text style={styles.cardMainTitle}>Advanced Data{'\n'}Structures</Text>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: '65%' }]} />
+                  </View>
+                  <Text style={styles.progressText}>65% Complete</Text>
+                </View>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                      <Text style={styles.avatarInitial}>JD</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
+                      <Text style={styles.avatarInitial}>AS</Text>
+                    </View>
+                  </View>
+                </View>
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('courses')} style={{ width: '100%', marginTop: 12 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+
+            {/* Course Card 2 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#eeeeee' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>COURSE</Text>
+                  </View>
+                </View>
+                <Text style={styles.cardMainTitle}>Modern UI{'\n'}Design Systems</Text>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: '40%' }]} />
+                  </View>
+                  <Text style={styles.progressText}>40% Complete</Text>
+                </View>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#4a4c4c' }]}>
+                      <Text style={styles.avatarInitial}>MK</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#7a7a7a', marginLeft: -10 }]}>
+                      <Text style={styles.avatarInitial}>TR</Text>
+                    </View>
+                  </View>
+                </View>
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('courses')} style={{ width: '100%', marginTop: 12 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+
+            {/* Course Card 3 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#e2e2e2' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>COURSE</Text>
+                  </View>
+                </View>
+                <Text style={styles.cardMainTitle}>Full-Stack{'\n'}Mastery Hub</Text>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: '15%' }]} />
+                  </View>
+                  <Text style={styles.progressText}>15% Complete</Text>
+                </View>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                      <Text style={styles.avatarInitial}>RN</Text>
+                    </View>
+                    <View style={[styles.avatar, { backgroundColor: '#5f5e5e', marginLeft: -10 }]}>
+                      <Text style={styles.avatarInitial}>PL</Text>
+                    </View>
+                  </View>
+                </View>
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('courses')} style={{ width: '100%', marginTop: 12 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+
+            {/* Course Card 4 */}
+            {renderCard(
+              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#d6d4d3' }]}>
+                <View style={styles.cardHeader}>
+                  <View style={[styles.badge, { backgroundColor: '#ffffff' }]}>
+                    <Text style={styles.badgeText}>COURSE</Text>
+                  </View>
+                </View>
+                <Text style={styles.cardMainTitle}>ML & Neural{'\n'}Networks</Text>
+                <View style={styles.progressContainer}>
+                  <View style={styles.progressBar}>
+                    <View style={[styles.progressFill, { width: '85%' }]} />
+                  </View>
+                  <Text style={styles.progressText}>85% Complete</Text>
+                </View>
+                <View style={styles.cardFooter}>
+                  <View style={styles.avatars}>
+                    <View style={[styles.avatar, { backgroundColor: '#333333' }]}>
+                      <Text style={styles.avatarInitial}>GM</Text>
+                    </View>
+                  </View>
+                </View>
+                <AnimatedPressable activeOpacity={0.85} onPress={() => onNavigate('courses')} style={{ width: '100%', marginTop: 12 }}>
+                  <LinearGradient
+                    colors={['#1a1c1c', '#4a4c4c']}
+                    style={styles.resumeButton}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 1 }}
+                  >
+                    <Text style={styles.resumeButtonText}>View Details  →</Text>
+                  </LinearGradient>
+                </AnimatedPressable>
+              </View>
+            )}
+          </ScrollView>
+        </View>
+
+        {/* Upcoming Events Section */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeader}>
+            <Text style={styles.sectionTitle}>Upcoming Events</Text>
           </View>
 
           {/* Recommended Item 1 - Internship */}
@@ -267,8 +550,90 @@ export default function Dashboard({ onProfileClick, onMenuClick, onNavigate, use
         </View>
 
         {/* Spacer for bottom nav */}
-        <View style={{ height: 100 }} />
+        <View style={{ height: 180 }} />
       </ScrollView>
+
+      {/* FAB Overlay & Menu */}
+      {isFabOpen && (
+        <View style={[StyleSheet.absoluteFillObject, { zIndex: 100 }]}>
+          <TouchableWithoutFeedback onPress={toggleFab}>
+            <Animated.View style={[styles.fabBackdrop, { opacity: fabAnim }]} />
+          </TouchableWithoutFeedback>
+          
+          <Animated.View style={[
+            styles.fabMenu,
+            {
+              opacity: fabAnim,
+              transform: [
+                { scale: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [0.8, 1] }) },
+                { translateY: fabAnim.interpolate({ inputRange: [0, 1], outputRange: [20, 0] }) }
+              ],
+              bottom: 185 + insets.bottom // positioned above the FAB with generous spacing
+            }
+          ]} pointerEvents="box-none">
+            <TouchableOpacity 
+              activeOpacity={0.9}
+              style={styles.fabMenuItem} 
+              onPress={() => {
+                toggleFab();
+                onNavigate('uploadLecture');
+              }}
+            >
+              <Text style={styles.fabMenuLabel}>Upload Guidance Lectures</Text>
+              <View style={styles.fabMenuIcon}>
+                <Heroicon name="academic-cap" size={20} color="#1a1c1c" />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              activeOpacity={0.9}
+              style={styles.fabMenuItem} 
+              onPress={() => {
+                toggleFab();
+                onNavigate('uploadCourse');
+              }}
+            >
+              <Text style={styles.fabMenuLabel}>Upload Courses</Text>
+              <View style={styles.fabMenuIcon}>
+                <Heroicon name="book-open-solid" size={20} color="#1a1c1c" />
+              </View>
+            </TouchableOpacity>
+            <TouchableOpacity 
+              activeOpacity={0.9}
+              style={styles.fabMenuItem} 
+              onPress={() => {
+                toggleFab();
+                onNavigate('uploadHackathon');
+              }}
+            >
+              <Text style={styles.fabMenuLabel}>Upload Hackathon</Text>
+              <View style={styles.fabMenuIcon}>
+                <Heroicon name="terminal-solid" size={20} color="#1a1c1c" />
+              </View>
+            </TouchableOpacity>
+          </Animated.View>
+        </View>
+      )}
+
+      {/* Main FAB */}
+      <View style={[styles.fabContainer, { bottom: 115 + insets.bottom }]}>
+        <AnimatedPressable onPress={toggleFab} style={{
+          transform: [{
+            rotate: fabAnim.interpolate({
+              inputRange: [0, 1],
+              outputRange: ['0deg', '45deg']
+            })
+          }]
+        }}>
+          <LinearGradient
+            colors={['#1a1c1c', '#4a4c4c']}
+            style={styles.fabGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Heroicon name="plus" size={24} color="#ffffff" strokeWidth={2.5} />
+          </LinearGradient>
+        </AnimatedPressable>
+      </View>
 
       {/* Bottom Navigation */}
       <View style={[styles.bottomNavContainer, { bottom: 20 + insets.bottom }]}>
@@ -374,21 +739,27 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 24,
     color: '#1a1c1c',
-    marginBottom: 18,
     fontFamily: 'CabinetGrotesk-Bold',
   },
   viewAll: {
     fontSize: 14,
     color: '#1a1c1c',
     textDecorationLine: 'underline',
-    marginBottom: 18,
     fontFamily: 'Inter-Medium',
   },
   activeCard: {
     backgroundColor: '#ffffff',
-    borderRadius: 16,
+    borderRadius: 20,
     padding: 24,
     marginBottom: 20,
+  },
+  horizontalScroll: {
+    paddingRight: 20,
+  },
+  horizontalCard: {
+    width: width - 40,
+    marginRight: 16,
+    marginBottom: 0,
   },
   cardHeader: {
     flexDirection: 'row',
@@ -476,10 +847,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Regular',
   },
   resumeButton: {
-    height: 56,
-    borderRadius: 999,
+    height: 50,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
+    width: '100%',
   },
   resumeButtonText: {
     color: '#ffffff',
@@ -559,8 +931,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     alignItems: 'center',
     paddingHorizontal: 10,
-    borderWidth: 1,
-    borderColor: 'rgba(0, 0, 0, 0.05)',
+    // No-Line Rule: Removed border
   },
   navItemContainer: {
     flex: 1,
@@ -658,6 +1029,67 @@ const styles = StyleSheet.create({
     color: '#000000',
     fontSize: 14,
     fontFamily: 'Inter-Bold',
+  },
+  fabContainer: {
+    position: 'absolute',
+    right: 20,
+    zIndex: 101,
+  },
+  fabGradient: {
+    width: 56,
+    height: 56,
+    borderRadius: 28,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 5,
+  },
+  fabBackdrop: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: 'rgba(249, 249, 249, 0.85)',
+  },
+  fabMenu: {
+    position: 'absolute',
+    right: 20,
+    alignItems: 'flex-end',
+    zIndex: 101,
+  },
+  fabMenuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  fabMenuLabel: {
+    fontSize: 14,
+    fontFamily: 'Inter-Semibold',
+    color: '#1a1c1c',
+    marginRight: 12,
+    backgroundColor: '#ffffff',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 12,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  fabMenuIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#ffffff',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 4,
   },
 });
 

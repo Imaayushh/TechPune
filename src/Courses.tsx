@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -7,6 +7,7 @@ import {
   ScrollView,
   Dimensions,
   Animated,
+  PanResponder,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
@@ -58,6 +59,24 @@ export default function Courses({ onBack }: CoursesProps) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const slideAnim = useRef(new Animated.Value(20)).current;
 
+  const panResponder = useRef(
+    PanResponder.create({
+      onMoveShouldSetPanResponder: (_, gestureState) => {
+        return (
+          Math.abs(gestureState.dx) > 10 &&
+          Math.abs(gestureState.dx) > Math.abs(gestureState.dy) &&
+          gestureState.x0 < 60 &&
+          gestureState.dx > 0
+        );
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        if (gestureState.dx > 120) {
+          onBack();
+        }
+      },
+    })
+  ).current;
+
   useEffect(() => {
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 500, useNativeDriver: true }),
@@ -90,7 +109,8 @@ export default function Courses({ onBack }: CoursesProps) {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
+      <View style={{ flex: 1 }} {...panResponder.panHandlers}>
+        <View style={styles.header}>
         <AnimatedPressable onPress={onBack} style={styles.backBtn}>
           <Heroicon name="chevron-left" size={24} color="#1a1c1c" />
         </AnimatedPressable>
@@ -158,6 +178,7 @@ export default function Courses({ onBack }: CoursesProps) {
         </Animated.View>
         <View style={{ height: 40 }} />
       </ScrollView>
+      </View>
     </SafeAreaView>
   );
 }
@@ -173,8 +194,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 16,
     height: 64,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    // No-Line Rule: Removed border
   },
   backBtn: {
     width: 40,
@@ -219,9 +239,9 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
   },
   statDivider: {
-    width: 1,
+    width: 2, // Slightly thicker to avoid "line" feel or use gap
     height: 30,
-    backgroundColor: 'rgba(255,255,255,0.1)',
+    backgroundColor: 'rgba(255,255,255,0.05)',
     marginHorizontal: 20,
   },
   sectionTitle: {
@@ -239,8 +259,7 @@ const styles = StyleSheet.create({
     padding: 16,
     width: 130,
     marginRight: 12,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+    // No-Line Rule: Removed border
   },
   categoryIcon: {
     width: 40,
@@ -267,8 +286,7 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     padding: 16,
     marginBottom: 16,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+    // No-Line Rule: Removed border
   },
   courseHeader: {
     flexDirection: 'row',

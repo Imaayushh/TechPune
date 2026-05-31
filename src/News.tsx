@@ -58,73 +58,146 @@ const newsItems = [
 
 export default function News({ onBack }: { onBack: () => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const flipAnim = useRef(new Animated.Value(0)).current;
+  const [visibleIndex, setVisibleIndex] = useState(0);
+  const [isScrubbing, setIsScrubbing] = useState(false);
+  const [selectedNews, setSelectedNews] = useState<typeof newsItems[0] | null>(null);
+  const scrollPos = useRef(new Animated.Value(0)).current;
+  const currentIndexRef = useRef(0);
+  const visibleIndexRef = useRef(0);
+
+  useEffect(() => {
+    currentIndexRef.current = currentIndex;
+    setVisibleIndex(currentIndex);
+    visibleIndexRef.current = currentIndex;
+  }, [currentIndex]);
 
   const panResponder = useRef(
     PanResponder.create({
       onStartShouldSetPanResponder: () => true,
       onPanResponderMove: (_, gestureState) => {
-        if (gestureState.dx < 0) {
-          // Swiping left to turn page
-          const progress = Math.min(Math.abs(gestureState.dx) / width, 1);
-          flipAnim.setValue(progress);
+        const progress = -gestureState.dx / width;
+        const targetPos = Math.max(0, Math.min(currentIndexRef.current + progress, newsItems.length));
+        scrollPos.setValue(targetPos);
+        
+        // Update visible index for rendering
+        const newVisible = Math.round(targetPos);
+        if (newVisible !== visibleIndexRef.current) {
+          visibleIndexRef.current = newVisible;
+          setVisibleIndex(newVisible);
         }
       },
       onPanResponderRelease: (_, gestureState) => {
-        if (gestureState.dx < -100 && currentIndex < newsItems.length - 1) {
-          // Success flip
-          Animated.timing(flipAnim, {
-            toValue: 1,
-            duration: 400,
+        if (gestureState.dx < -100 && currentIndexRef.current < newsItems.length) {
+          // Success flip forward
+          Animated.spring(scrollPos, {
+            toValue: currentIndexRef.current + 1,
             useNativeDriver: true,
+            friction: 8,
+            tension: 40,
           }).start(() => {
             setCurrentIndex(prev => prev + 1);
-            flipAnim.setValue(0);
           });
-        } else {
-          // Snap back
-          Animated.spring(flipAnim, {
-            toValue: 0,
+        } else if (gestureState.dx > 100 && currentIndexRef.current > 0) {
+          // Success flip backward
+          Animated.spring(scrollPos, {
+            toValue: currentIndexRef.current - 1,
             useNativeDriver: true,
-            bounciness: 10,
+            friction: 8,
+            tension: 40,
+          }).start(() => {
+            setCurrentIndex(prev => prev - 1);
+          });
+        } else if (gestureState.dx > 120 && currentIndexRef.current === 0 && gestureState.x0 < 60) {
+          // Swipe back to dashboard from the first news page
+          onBack();
+        } else {
+          // Snap back to current
+          Animated.spring(scrollPos, {
+            toValue: currentIndexRef.current,
+            useNativeDriver: true,
+            friction: 7,
+            tension: 30,
           }).start();
         }
       },
     })
   ).current;
 
+  const scrubberPanResponder = useRef(
+    PanResponder.create({
+      onStartShouldSetPanResponder: () => true,
+      onPanResponderGrant: () => {
+        setIsScrubbing(true);
+      },
+      onPanResponderMove: (_, gestureState) => {
+        const ratio = Math.max(0, Math.min(gestureState.moveX / width, 1));
+        const targetPos = ratio * newsItems.length;
+        scrollPos.setValue(targetPos);
+
+        const newVisible = Math.round(targetPos);
+        if (newVisible !== visibleIndexRef.current) {
+          visibleIndexRef.current = newVisible;
+          setVisibleIndex(newVisible);
+        }
+      },
+      onPanResponderRelease: (_, gestureState) => {
+        setIsScrubbing(false);
+        const ratio = Math.max(0, Math.min(gestureState.moveX / width, 1));
+        const targetIndex = Math.round(ratio * (newsItems.length));
+        const finalIndex = Math.min(targetIndex, newsItems.length);
+        
+        Animated.spring(scrollPos, {
+          toValue: finalIndex,
+          useNativeDriver: true,
+          friction: 8,
+          tension: 40,
+        }).start(() => {
+          setCurrentIndex(finalIndex);
+        });
+      },
+      onPanResponderTerminate: () => {
+        setIsScrubbing(false);
+      }
+    })
+  ).current;
+
   const renderPage = (item: typeof newsItems[0], index: number) => {
-    if (index < currentIndex) return null;
-    
     const isCurrent = index === currentIndex;
     const isNext = index === currentIndex + 1;
 
-    // Animation for current page flipping away
-    const rotateY = flipAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: ['0deg', '-120deg'],
+    // itemPos is 0 when current, 1 when next, -1 when flipped away
+    const itemPos = Animated.subtract(index, scrollPos);
+
+    const rotateY = itemPos.interpolate({
+      inputRange: [-1, 0, 1],
+      outputRange: ['-110deg', '0deg', '2deg'],
+      extrapolate: 'clamp',
     });
 
-    const opacity = flipAnim.interpolate({
-      inputRange: [0, 0.8, 1],
-      outputRange: [1, 0.3, 0],
+    const rotateZ = itemPos.interpolate({
+      inputRange: [-1, 0, 1],
+      outputRange: ['-5deg', '0deg', '1deg'],
+      extrapolate: 'clamp',
     });
 
-    const scale = flipAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [1, 0.9],
+    const opacity = itemPos.interpolate({
+      inputRange: [-1, -0.8, 0, 1],
+      outputRange: [0, 0.3, 1, 1],
+      extrapolate: 'clamp',
     });
 
-    // Animation for next page appearing underneath
-    const nextScale = flipAnim.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0.9, 1],
+    const scale = itemPos.interpolate({
+      inputRange: [-1, 0, 1],
+      outputRange: [0.9, 1, 0.9],
+      extrapolate: 'clamp',
     });
 
-    const nextOpacity = flipAnim.interpolate({
-      inputRange: [0, 0.5, 1],
-      outputRange: [0.5, 0.8, 1],
-    });
+    // Optimization: Don't render pages that are completely flipped away and invisible
+    // This keeps performance high while allowing smooth back-swiping
+    if (index < currentIndex - 1 || index > currentIndex + 1) {
+       // We still need the Animated.View wrapper for consistency, but we can skip content
+       // return null; // Actually, for only 4 items, let's just render them all for maximum stability
+    }
 
     return (
       <Animated.View 
@@ -132,23 +205,18 @@ export default function News({ onBack }: { onBack: () => void }) {
         style={[
           styles.pageContainer,
           { zIndex: newsItems.length - index },
-          isCurrent && {
+          {
             transform: [
-              { perspective: 1500 },
-              { translateX: -width / 2 },
+              { perspective: 2000 },
+              { translateX: -(width - 30) / 2 }, // Move to pivot (left edge)
               { rotateY },
-              { translateX: width / 2 },
+              { rotateZ },
+              { translateX: (width - 30) / 2 }, // Move back
               { scale }
             ],
             opacity
-          },
-          isNext && {
-            transform: [{ scale: nextScale }],
-            opacity: nextOpacity,
-          },
-          !isCurrent && !isNext && index > currentIndex && { display: 'none' }
+          }
         ]}
-        {...(isCurrent ? panResponder.panHandlers : {})}
       >
         <View style={styles.paperContent}>
           <View style={styles.masthead}>
@@ -166,7 +234,7 @@ export default function News({ onBack }: { onBack: () => void }) {
           <View style={styles.contentSection}>
             <View style={styles.verticalRule} />
             <View style={styles.textContent}>
-              <Text style={styles.locationText}>
+              <Text style={styles.locationText} numberOfLines={3}>
                 {item.location} — <Text style={styles.bodyText}>{item.content}</Text>
               </Text>
               <View style={styles.authorSection}>
@@ -175,6 +243,14 @@ export default function News({ onBack }: { onBack: () => void }) {
               </View>
             </View>
           </View>
+
+          <TouchableOpacity 
+            style={styles.viewDetailsBtn}
+            onPress={() => setSelectedNews(item)}
+          >
+            <Text style={styles.viewDetailsText}>VIEW DETAILS</Text>
+            <Heroicon name="arrow-right" size={14} color="#ffffff" />
+          </TouchableOpacity>
 
           <View style={styles.pageFooter}>
             <Text style={styles.pageNumber}>Page {item.id}</Text>
@@ -196,36 +272,135 @@ export default function News({ onBack }: { onBack: () => void }) {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>LATEST EDITION</Text>
         <TouchableOpacity 
-          onPress={() => setCurrentIndex(0)} 
+          onPress={() => {
+            scrollPos.setValue(0);
+            setCurrentIndex(0);
+            setSelectedNews(null);
+          }} 
           style={styles.refreshBtn}
         >
           <Heroicon name="refresh" size={18} color="#1a1c1c" />
         </TouchableOpacity>
       </View>
 
-      <View style={styles.newsStack}>
+      <View 
+        style={styles.newsStack}
+        {...panResponder.panHandlers}
+      >
         {newsItems.map((item, index) => renderPage(item, index))}
         
-        {currentIndex === newsItems.length - 1 && (
+        {visibleIndex === newsItems.length && (
            <View style={styles.endOfEdition}>
              <Heroicon name="check-circle" size={48} color="#1a1c1c" />
              <Text style={styles.endText}>You've read the entire edition!</Text>
-             <TouchableOpacity style={styles.resetBtn} onPress={() => setCurrentIndex(0)}>
+             <TouchableOpacity 
+               style={styles.resetBtn} 
+               onPress={() => {
+                 scrollPos.setValue(0);
+                 setCurrentIndex(0);
+                 setSelectedNews(null);
+               }}
+             >
                <Text style={styles.resetBtnText}>Read Again</Text>
              </TouchableOpacity>
            </View>
         )}
       </View>
 
-      <View style={styles.swipeIndicator}>
-        <Text style={styles.swipeText}>Swipe edge to turn page</Text>
-        <View style={styles.dotsRow}>
-          {newsItems.map((_, i) => (
-            <View 
-              key={i} 
-              style={[styles.dot, i === currentIndex && styles.dotActive]} 
-            />
-          ))}
+      {selectedNews && (
+        <View style={styles.detailOverlay}>
+          <SafeAreaView style={styles.detailContainer}>
+            <View style={styles.detailHeader}>
+              <TouchableOpacity 
+                onPress={() => setSelectedNews(null)}
+                style={styles.closeBtn}
+              >
+                <Heroicon name="x" size={24} color="#1a1c1c" />
+              </TouchableOpacity>
+              <Text style={styles.detailHeaderTitle}>NEWS DETAILS</Text>
+              <View style={{ width: 44 }} />
+            </View>
+
+            <View style={styles.detailContent}>
+              <Text style={styles.detailCategory}>{selectedNews.category}</Text>
+              <Text style={styles.detailTitle}>{selectedNews.title}</Text>
+              <View style={styles.detailDivider} />
+              <Text style={styles.detailHeadline}>{selectedNews.headline}</Text>
+              <Text style={styles.detailFullText}>
+                {selectedNews.location} — {selectedNews.content}
+                {"\n\n"}
+                Additional depth and context would go here in a real application. This detailed view provides a focused reading experience for the selected news item.
+                {"\n\n"}
+                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+              </Text>
+              
+              <View style={styles.detailFooter}>
+                <Text style={styles.detailAuthor}>By {selectedNews.author}</Text>
+                <Text style={styles.detailDate}>{selectedNews.date}</Text>
+              </View>
+            </View>
+          </SafeAreaView>
+        </View>
+      )}
+
+      <View 
+        style={styles.swipeIndicator}
+        {...scrubberPanResponder.panHandlers}
+      >
+        <Text style={styles.swipeText}>{isScrubbing ? "Scrubbing..." : "Slide to browse edition"}</Text>
+        <View style={[styles.dotsRow, { backgroundColor: isScrubbing ? '#1a1c1c' : '#f5f5f7' }]}>
+          {newsItems.map((_, i) => {
+            const dotScale = scrollPos.interpolate({
+              inputRange: [i - 1, i, i + 1],
+              outputRange: [1, 1.8, 1],
+              extrapolate: 'clamp',
+            });
+            const dotOpacity = scrollPos.interpolate({
+              inputRange: [i - 1, i, i + 1],
+              outputRange: [0.3, 1, 0.3],
+              extrapolate: 'clamp',
+            });
+            return (
+              <Animated.View 
+                key={i} 
+                style={[
+                  styles.dot, 
+                  { 
+                    backgroundColor: isScrubbing ? '#ffffff' : '#1a1c1c',
+                    opacity: dotOpacity,
+                    transform: [{ scaleX: dotScale }]
+                  }
+                ]} 
+              />
+            );
+          })}
+          {/* Dot for the end screen */}
+          {(() => {
+            const i = newsItems.length;
+            const dotScale = scrollPos.interpolate({
+              inputRange: [i - 1, i, i + 1],
+              outputRange: [1, 1.8, 1],
+              extrapolate: 'clamp',
+            });
+            const dotOpacity = scrollPos.interpolate({
+              inputRange: [i - 1, i, i + 1],
+              outputRange: [0.3, 1, 0.3],
+              extrapolate: 'clamp',
+            });
+            return (
+              <Animated.View 
+                key="end" 
+                style={[
+                  styles.dot, 
+                  { 
+                    backgroundColor: isScrubbing ? '#ffffff' : '#1a1c1c',
+                    opacity: dotOpacity,
+                    transform: [{ scaleX: dotScale }]
+                  }
+                ]} 
+              />
+            );
+          })()}
         </View>
       </View>
     </SafeAreaView>
@@ -244,8 +419,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     height: 64,
     backgroundColor: '#ffffff',
-    borderBottomWidth: 1,
-    borderBottomColor: '#d1d1d1',
+    // No-Line Rule: Removed border
     zIndex: 100,
   },
   backBtn: {
@@ -376,8 +550,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 20,
     paddingTop: 16,
-    borderTopWidth: 0.5,
-    borderTopColor: '#d1d1d1',
+    // No-Line Rule: Removed border
   },
   pageNumber: {
     fontSize: 12,
@@ -401,7 +574,12 @@ const styles = StyleSheet.create({
   },
   dotsRow: {
     flexDirection: 'row',
+    alignItems: 'center',
     gap: 6,
+    backgroundColor: '#f5f5f7',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 20,
   },
   dot: {
     width: 6,
@@ -414,7 +592,7 @@ const styles = StyleSheet.create({
     width: 12,
   },
   endOfEdition: {
-    flex: 1,
+    ...StyleSheet.absoluteFillObject,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 40,
@@ -436,5 +614,105 @@ const styles = StyleSheet.create({
   resetBtnText: {
     color: '#ffffff',
     fontFamily: 'Inter-Bold',
+  },
+  viewDetailsBtn: {
+    backgroundColor: '#1a1c1c',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 12,
+    borderRadius: 8,
+    marginTop: 20,
+    alignSelf: 'stretch',
+    gap: 6,
+  },
+  viewDetailsText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontFamily: 'Inter-Bold',
+    letterSpacing: 1,
+  },
+  detailOverlay: {
+    ...StyleSheet.absoluteFillObject,
+    backgroundColor: '#ffffff',
+    zIndex: 1000,
+  },
+  detailContainer: {
+    flex: 1,
+  },
+  detailHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 16,
+    height: 64,
+    // No-Line Rule: Removed border
+  },
+  detailHeaderTitle: {
+    fontSize: 12,
+    fontFamily: 'ClashDisplay-Bold',
+    letterSpacing: 2,
+    color: '#1a1c1c',
+  },
+  closeBtn: {
+    width: 44,
+    height: 44,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  detailContent: {
+    flex: 1,
+    padding: 24,
+  },
+  detailCategory: {
+    fontSize: 12,
+    fontFamily: 'Inter-Bold',
+    color: '#666666',
+    letterSpacing: 1,
+    marginBottom: 8,
+  },
+  detailTitle: {
+    fontSize: 32,
+    fontFamily: 'ClashDisplay-Bold',
+    color: '#1a1c1c',
+    lineHeight: 36,
+    marginBottom: 16,
+  },
+  detailDivider: {
+    width: 60,
+    height: 4,
+    backgroundColor: '#1a1c1c',
+    marginBottom: 24,
+  },
+  detailHeadline: {
+    fontSize: 18,
+    fontFamily: 'Inter-Bold',
+    color: '#1a1c1c',
+    lineHeight: 26,
+    marginBottom: 20,
+  },
+  detailFullText: {
+    fontSize: 16,
+    fontFamily: 'Inter-Regular',
+    color: '#333333',
+    lineHeight: 26,
+  },
+  detailFooter: {
+    marginTop: 'auto',
+    paddingTop: 24,
+    // No-Line Rule: Removed border
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  detailAuthor: {
+    fontSize: 12,
+    fontFamily: 'Inter-Bold',
+    color: '#1a1c1c',
+  },
+  detailDate: {
+    fontSize: 12,
+    fontFamily: 'Inter-Regular',
+    color: '#666666',
   },
 });

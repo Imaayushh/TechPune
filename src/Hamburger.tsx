@@ -357,12 +357,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
-    borderWidth: 1,
-    borderColor: 'rgba(255, 255, 255, 0.03)',
+    // No-Line Rule: Removed border
   },
   activeIconBox: {
     backgroundColor: '#1a1c1c',
-    borderColor: 'rgba(255, 255, 255, 0.08)',
+    // No-Line Rule: Removed border
   },
   menuText: {
     flex: 1,
@@ -401,8 +400,7 @@ const styles = StyleSheet.create({
   },
   footer: {
     padding: 24,
-    borderTopWidth: 1,
-    borderTopColor: 'rgba(255, 255, 255, 0.03)',
+    // No-Line Rule: Removed border
   },
   footerText: {
     fontSize: 10,

@@ -27,6 +27,7 @@ export type ProfilePageProps = {
   userMobile?: string;
   userAddress?: string;
   userDob?: string;
+  userCollege?: string;
   onUpdateProfile?: (data: PersonalInfo) => void;
 };
 
@@ -36,6 +37,7 @@ type PersonalInfo = {
   mobile: string;
   address: string;
   dob: string;
+  college: string;
 };
 
 // Reusable Animated Button Wrapper
@@ -87,6 +89,7 @@ export default function ProfilePage({
   userMobile,
   userAddress,
   userDob,
+  userCollege,
   onUpdateProfile
 }: ProfilePageProps) {
   const [isEditing, setIsEditing] = useState(false);
@@ -102,6 +105,7 @@ export default function ProfilePage({
     mobile: userMobile || '',
     address: userAddress || '',
     dob: userDob || '',
+    college: userCollege || '',
   });
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
@@ -142,6 +146,10 @@ export default function ProfilePage({
     }
     if (!personalInfo.address.trim()) {
       Alert.alert('Required Field', 'Address is mandatory.');
+      return false;
+    }
+    if (!personalInfo.college.trim()) {
+      Alert.alert('Required Field', 'College Name is mandatory.');
       return false;
     }
     return true;
@@ -309,6 +317,7 @@ export default function ProfilePage({
             {renderDetailRow('mail-solid', 'Email', personalInfo.email, 'email')}
             {renderDetailRow('phone-solid', 'Mobile Number', personalInfo.mobile, 'mobile')}
             {renderDetailRow('calendar-solid', 'Date of Birth', personalInfo.dob, 'dob')}
+            {renderDetailRow('building-library-solid', 'College', personalInfo.college, 'college')}
             {renderDetailRow('location-solid', 'Address', personalInfo.address, 'address', true)}
           </View>
         </View>
@@ -458,8 +467,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#ffffff',
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+    // No-Line Rule: Removed border
   },
   headerIconText: {
     fontSize: 20,
@@ -622,8 +630,7 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.04,
     shadowRadius: 16,
     elevation: 4,
-    borderWidth: 1,
-    borderColor: '#f0f0f0',
+    // No-Line Rule: Removed border
   },
   detailRow: {
     flexDirection: 'row',
@@ -661,8 +668,7 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Bold',
     color: '#1a1c1c',
     paddingVertical: 0,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
+    // No-Line Rule: Removed border
   },
   detailDivider: {
     height: 1,
@@ -781,8 +787,7 @@ const styles = StyleSheet.create({
   continueContainer: {
     padding: 20,
     backgroundColor: '#f9f9f9',
-    borderTopWidth: 1,
-    borderTopColor: '#eeeeee',
+    // No-Line Rule: Removed border
   },
   continueButton: {
     height: 58,

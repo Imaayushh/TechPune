@@ -3,7 +3,7 @@ import { StyleSheet, View, Animated } from 'react-native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
-import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold } from '@expo-google-fonts/inter';
+import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
 
 import LoginPage from './src/LoginPage';
 import Dashboard from './src/Dashboard';
@@ -17,8 +17,11 @@ import Hackathons from './src/Hackathons';
 import News from './src/News';
 import Courses from './src/Courses';
 import TermsAndConditions from './src/TermsAndConditions';
+import UploadHackathon from './src/UploadHackathon';
+import UploadCourse from './src/UploadCourse';
+import UploadLecture from './src/UploadLecture';
 
-type ViewKey = 'login' | 'dashboard' | 'profile' | 'settings' | 'changePassword' | 'securityPrivacy' | 'notifications' | 'hackathons' | 'news' | 'courses' | 'terms';
+type ViewKey = 'login' | 'dashboard' | 'profile' | 'settings' | 'changePassword' | 'securityPrivacy' | 'notifications' | 'hackathons' | 'news' | 'courses' | 'terms' | 'uploadHackathon' | 'uploadCourse' | 'uploadLecture';
 
 export default function App() {
   const [view, setView] = useState<ViewKey>('login');
@@ -59,6 +62,7 @@ export default function App() {
     'Inter-Regular': Inter_400Regular,
     'Inter-Medium': Inter_500Medium,
     'Inter-Semibold': Inter_600SemiBold,
+    'Inter-Bold': Inter_700Bold,
   });
 
   if (!fontsLoaded) return null;
@@ -92,6 +96,7 @@ export default function App() {
               userEmail={email} 
               onContinue={() => setView('dashboard')}
               userName={userName}
+              userCollege={userCollege}
               onUpdateName={setUserName}
               onProfileComplete={() => setIsProfileComplete(true)}
               userMobile={userMobile}
@@ -102,6 +107,7 @@ export default function App() {
                 setUserMobile(data.mobile);
                 setUserAddress(data.address);
                 setUserDob(data.dob);
+                setUserCollege(data.college);
               }}
             />
           ) : view === 'settings' ? (
@@ -126,6 +132,12 @@ export default function App() {
               onBack={() => setView('dashboard')}
               onAccept={() => setView('dashboard')}
             />
+          ) : view === 'uploadHackathon' ? (
+            <UploadHackathon onBack={() => setView('dashboard')} />
+          ) : view === 'uploadCourse' ? (
+            <UploadCourse onBack={() => setView('dashboard')} />
+          ) : view === 'uploadLecture' ? (
+            <UploadLecture onBack={() => setView('dashboard')} />
           ) : (
             <LoginPage 
               onComplete={handleLoginComplete}
