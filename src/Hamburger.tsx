@@ -1,250 +1,208 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   StyleSheet,
   View,
   Text,
-  TouchableOpacity,
   ScrollView,
   Dimensions,
   TouchableWithoutFeedback,
   Alert,
   Animated,
+  Keyboard,
+  Pressable,
 } from 'react-native';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Heroicon } from './Heroicon';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useNavigation } from '@react-navigation/native';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { Heroicon, type IconName } from './Heroicon';
+import { useAppContext } from './context/AppContext';
+import type { RootStackParamList } from './types';
 
-const { width, height } = Dimensions.get('window');
-
-// Reusable Animated Button Wrapper
-const AnimatedPressable = ({ children, onPress, style, activeOpacity = 0.7 }: any) => {
-  const scale = useRef(new Animated.Value(1)).current;
-
-  const handlePressIn = () => {
-    Animated.spring(scale, {
-      toValue: 0.97,
-      useNativeDriver: true,
-      speed: 20,
-      bounciness: 0,
-    }).start();
-  };
-
-  const handlePressOut = () => {
-    Animated.spring(scale, {
-      toValue: 1,
-      useNativeDriver: true,
-      speed: 20,
-      bounciness: 0,
-    }).start();
-  };
-
-  return (
-    <Animated.View style={[{ transform: [{ scale }] }, style]}>
-      <TouchableOpacity
-        activeOpacity={activeOpacity}
-        onPress={onPress}
-        onPressIn={handlePressIn}
-        onPressOut={handlePressOut}
-        style={{ flexDirection: 'row', alignItems: 'center' }}
-      >
-        {children}
-      </TouchableOpacity>
-    </Animated.View>
-  );
-};
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
+const DRAWER_WIDTH = SCREEN_WIDTH * 0.78;
 
 type MenuItem = {
   title: string;
-  icon: string;
-  target: string;
-  active?: boolean;
+  icon: IconName;
+  target: keyof RootStackParamList | 'logout';
   logout?: boolean;
 };
 
-export type HamburgerProps = {
-  onBack: () => void;
-  onLogout: () => void;
-  onProfileClick: () => void;
-  onSettingsClick: () => void;
-  onSecurityClick: () => void;
-  onNotificationsClick: () => void;
-  onDashboardClick: () => void;
-  onHackathonsClick: () => void;
-  onNewsClick: () => void;
-  onCoursesClick: () => void;
-  onTermsClick: () => void;
-  currentView: string;
-  userEmail?: string;
-  userName?: string;
-};
+const MAIN_ITEMS: MenuItem[] = [
+  { title: 'Dashboard', icon: 'home', target: 'Dashboard' },
+  { title: 'Hackathons', icon: 'code-bracket', target: 'Hackathons' },
+  { title: 'News & Updates', icon: 'newspaper', target: 'News' },
+  { title: 'Courses', icon: 'book-stack', target: 'Courses' },
+];
 
-export default function Hamburger({ 
-  onBack, 
-  onLogout, 
-  onProfileClick, 
-  onSettingsClick, 
-  onSecurityClick,
-  onNotificationsClick,
-  onDashboardClick,
-  onHackathonsClick,
-  onNewsClick,
-  onCoursesClick,
-  onTermsClick,
-  currentView,
-  userEmail, 
-  userName 
-}: HamburgerProps) {
-  const insets = useSafeAreaInsets();
-  const slideAnim = useRef(new Animated.Value(-width * 0.8)).current;
+const ACCOUNT_ITEMS: MenuItem[] = [
+  { title: 'My Profile', icon: 'user', target: 'Profile' },
+  { title: 'Account Settings', icon: 'cog', target: 'AccountSettings' },
+];
+
+const SETTINGS_ITEMS: MenuItem[] = [
+  { title: 'Security & Privacy', icon: 'shield-lock', target: 'SecurityPrivacy' },
+  { title: 'Notifications', icon: 'bell', target: 'Notifications' },
+];
+
+const SUPPORT_ITEMS: MenuItem[] = [
+  { title: 'Terms & Conditions', icon: 'document', target: 'Terms' },
+];
+
+export default function Hamburger() {
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { user, resetUser, setMenuVisible } = useAppContext();
+  const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 250,
-        useNativeDriver: true,
-      }),
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        tension: 50,
-        friction: 10,
-        useNativeDriver: true,
-      })
+      Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
+      Animated.spring(slideAnim, { toValue: 0, tension: 50, friction: 10, useNativeDriver: true }),
     ]).start();
   }, []);
 
-  const handleClose = () => {
+  const close = () => {
+    Keyboard.dismiss();
     Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: -width * 0.8,
-        duration: 250,
-        useNativeDriver: true,
-      })
-    ]).start(() => onBack());
+      Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
+      Animated.timing(slideAnim, { toValue: -DRAWER_WIDTH, duration: 250, useNativeDriver: true }),
+    ]).start(() => setMenuVisible(false));
   };
 
-  const renderMenuItem = (item: MenuItem, index: number) => (
-    <AnimatedPressable
-      key={`${item.target}-${index}`}
-      style={[styles.menuItem, item.active && styles.activeMenuItem]}
-      onPress={() => {
-        if (item.target === 'dashboard') onDashboardClick();
-        else if (item.target === 'profile') onProfileClick();
-        else if (item.target === 'settings') onSettingsClick();
-        else if (item.target === 'security') onSecurityClick();
-        else if (item.target === 'notifications') onNotificationsClick();
-        else if (item.target === 'hackathons') onHackathonsClick();
-        else if (item.target === 'news') onNewsClick();
-        else if (item.target === 'courses') onCoursesClick();
-        else if (item.target === 'terms') onTermsClick();
-        else if (item.target === 'logout') {
-          Alert.alert("Sign Out", "Are you sure you want to log out?", [
-            { text: "Cancel", style: "cancel" },
-            { text: "Sign Out", onPress: onLogout }
-          ]);
-        }
-        else console.log(`Navigating to ${item.target}`);
-      }}
-    >
-      <View style={[styles.iconBox, item.active && styles.activeIconBox]}>
-        <Heroicon 
-          name={item.icon} 
-          size={18} 
-          color={item.logout ? '#ff4b4b' : (item.active ? '#ffffff' : '#9a9a9a')} 
-        />
-      </View>
-      <Text style={[
-        styles.menuText, 
-        item.logout && styles.logoutText,
-        item.active && styles.activeText
-      ]}>
-        {item.title}
-      </Text>
-      <View style={styles.rightSlot}>
-        {item.active ? (
-          <View style={styles.activeIndicator} />
-        ) : (
-          !item.logout && <Heroicon name="chevron-right" size={14} color="#333333" />
-        )}
-      </View>
-    </AnimatedPressable>
-  );
+  const navigateTo = (target: keyof RootStackParamList) => {
+    close();
+    if (target === 'Dashboard') {
+      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
+    } else {
+      navigation.navigate(target);
+    }
+  };
 
-  const MenuSection = ({ title, items }: { title: string; items: MenuItem[] }) => (
-    <View style={styles.section}>
-      <Text style={styles.sectionTitle}>{title}</Text>
-      {items.map((item, index) => renderMenuItem(item, index))}
-    </View>
-  );
-
-  const mainItems: MenuItem[] = [
-    { title: 'Dashboard', icon: 'home-solid', target: 'dashboard', active: currentView === 'dashboard' },
-    { title: 'Hackathons', icon: 'terminal-solid', target: 'hackathons', active: currentView === 'hackathons' },
-    { title: 'News & Updates', icon: 'globe-solid', target: 'news', active: currentView === 'news' },
-    { title: 'Courses', icon: 'book-open-solid', target: 'courses', active: currentView === 'courses' },
-  ];
-
-  const accountItems: MenuItem[] = [
-    { title: 'My Profile', icon: 'user-solid', target: 'profile', active: currentView === 'profile' },
-    { title: 'Account Settings', icon: 'cog', target: 'settings', active: currentView === 'settings' },
-  ];
-
-  const settingsItems: MenuItem[] = [
-    { title: 'Security & Privacy', icon: 'shield-lock-solid', target: 'security', active: currentView === 'securityPrivacy' },
-    { title: 'Two-Factor Authentication', icon: 'lock-solid', target: '2fa' },
-    { title: 'Notifications', icon: 'bell-solid', target: 'notifications', active: currentView === 'notifications' },
-  ];
-
-  const supportItems: MenuItem[] = [
-    { title: 'Help & Support', icon: 'heart-solid', target: 'help' },
-    { title: 'Terms & Conditions', icon: 'document', target: 'terms', active: currentView === 'terms' },
-  ];
+  const handleLogout = () => {
+    close();
+    Alert.alert("Sign Out", "Are you sure you want to log out?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Sign Out",
+        onPress: () => {
+          resetUser();
+          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+        },
+      },
+    ]);
+  };
 
   return (
     <View style={styles.overlay}>
-      <TouchableWithoutFeedback onPress={handleClose}>
+      <TouchableWithoutFeedback onPress={close}>
         <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
       </TouchableWithoutFeedback>
 
-      <Animated.View style={[styles.drawerContainer, { transform: [{ translateX: slideAnim }] }]}>
+      <Animated.View style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}>
         <SafeAreaView style={styles.safeArea}>
-          {/* Profile Header */}
           <View style={styles.header}>
-            <View style={styles.profileBox}>
-              <View style={styles.avatar}>
-                <Text style={styles.avatarLetter}>{(userName || 'U').charAt(0)}</Text>
-              </View>
-              <View style={styles.profileInfo}>
-                <Text style={styles.userName} numberOfLines={1}>{userName || 'User'}</Text>
-                <Text style={styles.userEmail} numberOfLines={1}>{userEmail || 'user@techpune.com'}</Text>
-              </View>
+            <View style={styles.avatar}>
+              <Text style={styles.avatarLetter}>
+                {(user.fullName || 'U').charAt(0).toUpperCase()}
+              </Text>
+            </View>
+            <View style={styles.headerText}>
+              <Text style={styles.userName} numberOfLines={1}>
+                {user.fullName || 'User'}
+              </Text>
+              <Text style={styles.userEmail} numberOfLines={1}>
+                {user.email || 'user@techpune.com'}
+              </Text>
             </View>
           </View>
-          <View style={styles.headerDivider} />
 
-          <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
-            <MenuSection title="MAIN MENU" items={mainItems} />
-            <MenuSection title="ACCOUNT" items={accountItems} />
-            <MenuSection title="SETTINGS" items={settingsItems} />
-            <MenuSection title="SUPPORT" items={supportItems} />
+          <View style={styles.divider} />
 
-            <View style={styles.exitSection}>
-              <View style={styles.divider} />
-              {renderMenuItem({ title: 'Log Out', icon: 'logout', target: 'logout', logout: true }, 0)}
-            </View>
+          <ScrollView
+            contentContainerStyle={styles.scrollContent}
+            showsVerticalScrollIndicator={false}
+          >
+            <MenuSection title="MAIN MENU" items={MAIN_ITEMS} onPress={navigateTo} />
+            <MenuSection title="ACCOUNT" items={ACCOUNT_ITEMS} onPress={navigateTo} />
+            <MenuSection title="SETTINGS" items={SETTINGS_ITEMS} onPress={navigateTo} />
+            <MenuSection title="SUPPORT" items={SUPPORT_ITEMS} onPress={navigateTo} />
+
+            <View style={styles.divider} />
+
+            <MenuItemRow
+              icon="logout"
+              title="Log Out"
+              color="#ff4b4b"
+              onPress={handleLogout}
+            />
           </ScrollView>
 
-          <View style={styles.footer}>
-            <Text style={styles.footerText}>TechPune v1.0.4</Text>
-          </View>
+
         </SafeAreaView>
       </Animated.View>
     </View>
+  );
+}
+
+function MenuSection({
+  title,
+  items,
+  onPress,
+}: {
+  title: string;
+  items: MenuItem[];
+  onPress: (target: keyof RootStackParamList) => void;
+}) {
+  return (
+    <View style={styles.section}>
+      <Text style={styles.sectionTitle}>{title}</Text>
+      {items.map((item) => (
+        <MenuItemRow
+          key={item.target}
+          icon={item.icon}
+          title={item.title}
+          onPress={() => onPress(item.target as keyof RootStackParamList)}
+          showChevron
+        />
+      ))}
+    </View>
+  );
+}
+
+function MenuItemRow({
+  icon,
+  title,
+  color,
+  onPress,
+  showChevron,
+}: {
+  icon: IconName;
+  title: string;
+  color?: string;
+  onPress: () => void;
+  showChevron?: boolean;
+}) {
+  return (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed }) => [
+        styles.menuRow,
+        pressed && styles.menuRowPressed,
+      ]}
+    >
+      <View style={[styles.iconBox, color ? { backgroundColor: 'rgba(255, 75, 75, 0.12)' } : undefined]}>
+        <Heroicon name={icon} size={18} color={color || '#e0e0e0'} />
+      </View>
+      <Text style={[styles.menuLabel, color ? { color } : undefined]}>
+        {title}
+      </Text>
+      {showChevron && (
+        <View style={styles.chevronBox}>
+          <Heroicon name="chevron-right" size={14} color="#555555" />
+        </View>
+      )}
+    </Pressable>
   );
 }
 
@@ -253,25 +211,25 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 0,
     left: 0,
-    width,
-    height,
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
     zIndex: 1000,
   },
   backdrop: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width,
-    height,
-    backgroundColor: 'rgba(0, 0, 0, 0.7)',
+    width: SCREEN_WIDTH,
+    height: SCREEN_HEIGHT,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
-  drawerContainer: {
-    width: width * 0.8,
-    height,
-    backgroundColor: '#000000',
+  drawer: {
+    width: DRAWER_WIDTH,
+    height: SCREEN_HEIGHT,
+    backgroundColor: '#1a1c1c',
     shadowColor: '#000',
     shadowOffset: { width: 10, height: 0 },
-    shadowOpacity: 0.5,
+    shadowOpacity: 0.4,
     shadowRadius: 20,
     elevation: 20,
   },
@@ -279,13 +237,11 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     paddingHorizontal: 24,
     paddingTop: 32,
     paddingBottom: 24,
-  },
-  profileBox: {
-    flexDirection: 'row',
-    alignItems: 'center',
   },
   avatar: {
     width: 50,
@@ -299,9 +255,9 @@ const styles = StyleSheet.create({
   avatarLetter: {
     fontSize: 20,
     fontFamily: 'ClashDisplay-Bold',
-    color: '#000000',
+    color: '#1a1c1c',
   },
-  profileInfo: {
+  headerText: {
     flex: 1,
   },
   userName: {
@@ -315,10 +271,11 @@ const styles = StyleSheet.create({
     fontFamily: 'Inter-Medium',
     color: '#9a9a9a',
   },
-  headerDivider: {
+  divider: {
     height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     marginHorizontal: 24,
+    marginVertical: 4,
   },
   scrollContent: {
     paddingHorizontal: 16,
@@ -326,88 +283,47 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   section: {
-    marginBottom: 32,
+    marginBottom: 28,
   },
   sectionTitle: {
     fontSize: 10,
     fontFamily: 'Inter-Bold',
-    color: '#444444',
+    color: '#777777',
     letterSpacing: 1.5,
-    marginBottom: 16,
+    marginBottom: 8,
     marginLeft: 12,
     textTransform: 'uppercase',
   },
-  menuItem: {
+  menuRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 10,
+    paddingVertical: 12,
     paddingHorizontal: 12,
     borderRadius: 14,
-    marginBottom: 4,
-    position: 'relative',
+    marginBottom: 2,
   },
-  activeMenuItem: {
-    backgroundColor: '#121212',
+  menuRowPressed: {
+    backgroundColor: 'rgba(255, 255, 255, 0.08)',
   },
   iconBox: {
-    width: 32,
-    height: 32,
-    borderRadius: 8,
-    backgroundColor: '#0a0a0a',
+    width: 34,
+    height: 34,
+    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 14,
-    // No-Line Rule: Removed border
   },
-  activeIconBox: {
-    backgroundColor: '#1a1c1c',
-    // No-Line Rule: Removed border
-  },
-  menuText: {
+  menuLabel: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Inter-Medium',
-    color: '#9a9a9a',
-    textAlignVertical: 'center',
+    color: '#e0e0e0',
   },
-  activeText: {
-    color: '#ffffff',
-    fontFamily: 'Inter-Semibold',
-  },
-  rightSlot: {
+  chevronBox: {
     width: 24,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  logoutText: {
-    color: '#ff4b4b',
-    fontFamily: 'Inter-Bold',
-  },
-  activeIndicator: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#ffffff',
-  },
-  exitSection: {
-    marginTop: 8,
-  },
-  divider: {
-    height: 1,
-    backgroundColor: 'rgba(255, 255, 255, 0.05)',
-    marginVertical: 16,
-    marginHorizontal: 12,
-  },
-  footer: {
-    padding: 24,
-    // No-Line Rule: Removed border
-  },
-  footerText: {
-    fontSize: 10,
-    fontFamily: 'Inter-Medium',
-    color: '#333333',
-    textAlign: 'center',
-  },
+
 });
-
-

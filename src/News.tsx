@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+﻿import React, { useRef, useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -10,6 +10,8 @@ import {
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heroicon } from './Heroicon';
+import PageHeader from './components/PageHeader';
+import DetailOverlay from './components/DetailOverlay';
 
 const { width, height } = Dimensions.get('window');
 
@@ -56,11 +58,11 @@ const newsItems = [
   }
 ];
 
-export default function News({ onBack }: { onBack: () => void }) {
+export default function News({ onBack }: { onBack?: () => void }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [visibleIndex, setVisibleIndex] = useState(0);
-  const [isScrubbing, setIsScrubbing] = useState(false);
   const [selectedNews, setSelectedNews] = useState<typeof newsItems[0] | null>(null);
+  const [isScrubbing, setIsScrubbing] = useState(false);
   const scrollPos = useRef(new Animated.Value(0)).current;
   const currentIndexRef = useRef(0);
   const visibleIndexRef = useRef(0);
@@ -109,7 +111,7 @@ export default function News({ onBack }: { onBack: () => void }) {
           });
         } else if (gestureState.dx > 120 && currentIndexRef.current === 0 && gestureState.x0 < 60) {
           // Swipe back to dashboard from the first news page
-          onBack();
+          onBack?.();
         } else {
           // Snap back to current
           Animated.spring(scrollPos, {
@@ -161,127 +163,12 @@ export default function News({ onBack }: { onBack: () => void }) {
     })
   ).current;
 
-  const renderPage = (item: typeof newsItems[0], index: number) => {
-    const isCurrent = index === currentIndex;
-    const isNext = index === currentIndex + 1;
-
-    // itemPos is 0 when current, 1 when next, -1 when flipped away
-    const itemPos = Animated.subtract(index, scrollPos);
-
-    const rotateY = itemPos.interpolate({
-      inputRange: [-1, 0, 1],
-      outputRange: ['-110deg', '0deg', '2deg'],
-      extrapolate: 'clamp',
-    });
-
-    const rotateZ = itemPos.interpolate({
-      inputRange: [-1, 0, 1],
-      outputRange: ['-5deg', '0deg', '1deg'],
-      extrapolate: 'clamp',
-    });
-
-    const opacity = itemPos.interpolate({
-      inputRange: [-1, -0.8, 0, 1],
-      outputRange: [0, 0.3, 1, 1],
-      extrapolate: 'clamp',
-    });
-
-    const scale = itemPos.interpolate({
-      inputRange: [-1, 0, 1],
-      outputRange: [0.9, 1, 0.9],
-      extrapolate: 'clamp',
-    });
-
-    // Optimization: Don't render pages that are completely flipped away and invisible
-    // This keeps performance high while allowing smooth back-swiping
-    if (index < currentIndex - 1 || index > currentIndex + 1) {
-       // We still need the Animated.View wrapper for consistency, but we can skip content
-       // return null; // Actually, for only 4 items, let's just render them all for maximum stability
-    }
-
-    return (
-      <Animated.View 
-        key={item.id}
-        style={[
-          styles.pageContainer,
-          { zIndex: newsItems.length - index },
-          {
-            transform: [
-              { perspective: 2000 },
-              { translateX: -(width - 30) / 2 }, // Move to pivot (left edge)
-              { rotateY },
-              { rotateZ },
-              { translateX: (width - 30) / 2 }, // Move back
-              { scale }
-            ],
-            opacity
-          }
-        ]}
-      >
-        <View style={styles.paperContent}>
-          <View style={styles.masthead}>
-            <Text style={styles.mastheadTitle}>TECHPUNE GAZETTE</Text>
-            <View style={styles.mastheadDivider} />
-            <View style={styles.mastheadMeta}>
-              <Text style={styles.metaText}>{item.date}</Text>
-              <Text style={styles.metaText}>{item.category}</Text>
-            </View>
-            <View style={styles.mastheadDivider} />
-          </View>
-
-          <Text style={styles.mainHeadline}>{item.headline}</Text>
-          
-          <View style={styles.contentSection}>
-            <View style={styles.verticalRule} />
-            <View style={styles.textContent}>
-              <Text style={styles.locationText} numberOfLines={3}>
-                {item.location} — <Text style={styles.bodyText}>{item.content}</Text>
-              </Text>
-              <View style={styles.authorSection}>
-                <View style={styles.authorLine} />
-                <Text style={styles.authorText}>Written by {item.author}</Text>
-              </View>
-            </View>
-          </View>
-
-          <TouchableOpacity 
-            style={styles.viewDetailsBtn}
-            onPress={() => setSelectedNews(item)}
-          >
-            <Text style={styles.viewDetailsText}>VIEW DETAILS</Text>
-            <Heroicon name="arrow-right" size={14} color="#ffffff" />
-          </TouchableOpacity>
-
-          <View style={styles.pageFooter}>
-            <Text style={styles.pageNumber}>Page {item.id}</Text>
-            <View style={styles.socialIcons}>
-              <Heroicon name="heart" size={20} color="#1a1c1c" />
-              <Heroicon name="share" size={20} color="#1a1c1c" />
-            </View>
-          </View>
-        </View>
-      </Animated.View>
-    );
-  };
+  const renderPage = (item: typeof newsItems[0], index: number) =>
+    <NewsCard key={item.id} item={item} index={index} scrollPos={scrollPos} totalItems={newsItems.length} width={width} onViewDetails={setSelectedNews} />;
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.header}>
-        <TouchableOpacity onPress={onBack} style={styles.backBtn}>
-          <Heroicon name="chevron-left" size={24} color="#1a1c1c" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>LATEST EDITION</Text>
-        <TouchableOpacity 
-          onPress={() => {
-            scrollPos.setValue(0);
-            setCurrentIndex(0);
-            setSelectedNews(null);
-          }} 
-          style={styles.refreshBtn}
-        >
-          <Heroicon name="refresh" size={18} color="#1a1c1c" />
-        </TouchableOpacity>
-      </View>
+      <PageHeader title="LATEST EDITION" />
 
       <View 
         style={styles.newsStack}
@@ -308,39 +195,26 @@ export default function News({ onBack }: { onBack: () => void }) {
       </View>
 
       {selectedNews && (
-        <View style={styles.detailOverlay}>
-          <SafeAreaView style={styles.detailContainer}>
-            <View style={styles.detailHeader}>
-              <TouchableOpacity 
-                onPress={() => setSelectedNews(null)}
-                style={styles.closeBtn}
-              >
-                <Heroicon name="x" size={24} color="#1a1c1c" />
-              </TouchableOpacity>
-              <Text style={styles.detailHeaderTitle}>NEWS DETAILS</Text>
-              <View style={{ width: 44 }} />
+        <DetailOverlay visible onClose={() => setSelectedNews(null)} title="NEWS DETAILS" bgColor="#f9f9f9">
+          <View style={styles.detailContent}>
+            <Text style={styles.detailCategory}>{selectedNews.category}</Text>
+            <Text style={styles.detailTitle}>{selectedNews.title}</Text>
+            <View style={styles.detailDivider} />
+            <Text style={styles.detailHeadline}>{selectedNews.headline}</Text>
+            <Text style={styles.detailFullText}>
+              {selectedNews.location} — {selectedNews.content}
+              {"\n\n"}
+              Additional depth and context would go here in a real application. This detailed view provides a focused reading experience for the selected news item.
+              {"\n\n"}
+              Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+            </Text>
+            
+            <View style={styles.detailFooter}>
+              <Text style={styles.detailAuthor}>By {selectedNews.author}</Text>
+              <Text style={styles.detailDate}>{selectedNews.date}</Text>
             </View>
-
-            <View style={styles.detailContent}>
-              <Text style={styles.detailCategory}>{selectedNews.category}</Text>
-              <Text style={styles.detailTitle}>{selectedNews.title}</Text>
-              <View style={styles.detailDivider} />
-              <Text style={styles.detailHeadline}>{selectedNews.headline}</Text>
-              <Text style={styles.detailFullText}>
-                {selectedNews.location} — {selectedNews.content}
-                {"\n\n"}
-                Additional depth and context would go here in a real application. This detailed view provides a focused reading experience for the selected news item.
-                {"\n\n"}
-                Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-              </Text>
-              
-              <View style={styles.detailFooter}>
-                <Text style={styles.detailAuthor}>By {selectedNews.author}</Text>
-                <Text style={styles.detailDate}>{selectedNews.date}</Text>
-              </View>
-            </View>
-          </SafeAreaView>
-        </View>
+          </View>
+        </DetailOverlay>
       )}
 
       <View 
@@ -407,312 +281,118 @@ export default function News({ onBack }: { onBack: () => void }) {
   );
 }
 
+function NewsCard({ item, index, scrollPos, totalItems, width, onViewDetails }: {
+  item: typeof newsItems[0];
+  index: number;
+  scrollPos: Animated.Value;
+  totalItems: number;
+  width: number;
+  onViewDetails: (item: typeof newsItems[0]) => void;
+}) {
+  const itemPos = useRef(Animated.subtract(index, scrollPos)).current;
+  const rotateY = useRef(itemPos.interpolate({ inputRange: [-1, 0, 1], outputRange: ['-110deg', '0deg', '2deg'], extrapolate: 'clamp' })).current;
+  const rotateZ = useRef(itemPos.interpolate({ inputRange: [-1, 0, 1], outputRange: ['-5deg', '0deg', '1deg'], extrapolate: 'clamp' })).current;
+  const opacity = useRef(itemPos.interpolate({ inputRange: [-1, -0.8, 0, 1], outputRange: [0, 0.3, 1, 1], extrapolate: 'clamp' })).current;
+  const scale = useRef(itemPos.interpolate({ inputRange: [-1, 0, 1], outputRange: [0.9, 1, 0.9], extrapolate: 'clamp' })).current;
+
+  return (
+    <Animated.View
+      style={[
+        styles.pageContainer,
+        { zIndex: totalItems - index },
+        {
+          transform: [
+            { perspective: 2000 },
+            { translateX: -(width - 30) / 2 },
+            { rotateY },
+            { rotateZ },
+            { translateX: (width - 30) / 2 },
+            { scale },
+          ],
+          opacity,
+        },
+      ]}
+    >
+      <View style={styles.paperContent}>
+        <View style={styles.masthead}>
+          <Text style={styles.mastheadTitle}>TECHPUNE GAZETTE</Text>
+          <View style={styles.mastheadDivider} />
+          <View style={styles.mastheadMeta}>
+            <Text style={styles.metaText}>{item.date}</Text>
+            <Text style={styles.metaText}>{item.category}</Text>
+          </View>
+          <View style={styles.mastheadDivider} />
+        </View>
+        <Text style={styles.mainHeadline}>{item.headline}</Text>
+        <View style={styles.contentSection}>
+          <View style={styles.verticalRule} />
+          <View style={styles.textContent}>
+            <Text style={styles.locationText} numberOfLines={3}>
+              {item.location} â€” <Text style={styles.bodyText}>{item.content}</Text>
+            </Text>
+            <View style={styles.authorSection}>
+              <View style={styles.authorLine} />
+              <Text style={styles.authorText}>Written by {item.author}</Text>
+            </View>
+          </View>
+        </View>
+        <TouchableOpacity style={styles.viewDetailsBtn} onPress={() => onViewDetails(item)}>
+          <Text style={styles.viewDetailsText}>VIEW DETAILS</Text>
+          <Heroicon name="arrow-right" size={14} color="#ffffff" />
+        </TouchableOpacity>
+        <View style={styles.pageFooter}>
+          <Text style={styles.pageNumber}>Page {item.id}</Text>
+          <View style={styles.socialIcons}>
+            <Heroicon name="heart" size={20} color="#1a1c1c" />
+            <Heroicon name="share" size={20} color="#1a1c1c" />
+          </View>
+        </View>
+      </View>
+    </Animated.View>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#e5e5e7',
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    height: 64,
-    backgroundColor: '#ffffff',
-    // No-Line Rule: Removed border
-    zIndex: 100,
-  },
-  backBtn: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    backgroundColor: '#f5f5f7',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  refreshBtn: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  headerTitle: {
-    fontSize: 12,
-    fontFamily: 'ClashDisplay-Bold',
-    letterSpacing: 2,
-    color: '#1a1c1c',
-  },
-  newsStack: {
-    flex: 1,
-    position: 'relative',
-    overflow: 'hidden',
-    padding: 15,
-  },
-  pageContainer: {
-    position: 'absolute',
-    top: 15,
-    left: 15,
-    right: 15,
-    bottom: 15,
-  },
-  paperContent: {
-    backgroundColor: '#ffffff',
-    flex: 1,
-    borderRadius: 4,
-    padding: 24,
-    shadowColor: '#000',
-    shadowOffset: { width: -10, height: 10 },
-    shadowOpacity: 0.2,
-    shadowRadius: 15,
-    elevation: 10,
-    borderLeftWidth: 8,
-    borderLeftColor: '#f0f0f0',
-  },
-  masthead: {
-    alignItems: 'center',
-    marginBottom: 24,
-  },
-  mastheadTitle: {
-    fontSize: 28,
-    fontFamily: 'ClashDisplay-Bold',
-    color: '#1a1c1c',
-    letterSpacing: -1,
-    marginBottom: 8,
-  },
-  mastheadDivider: {
-    width: '100%',
-    height: 1.5,
-    backgroundColor: '#1a1c1c',
-    marginVertical: 4,
-  },
-  mastheadMeta: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    paddingHorizontal: 4,
-  },
-  metaText: {
-    fontSize: 9,
-    fontFamily: 'Inter-Bold',
-    color: '#1a1c1c',
-    letterSpacing: 0.5,
-  },
-  mainHeadline: {
-    fontSize: 30,
-    fontFamily: 'ClashDisplay-Bold',
-    color: '#1a1c1c',
-    lineHeight: 32,
-    marginBottom: 20,
-    textAlign: 'center',
-    textTransform: 'uppercase',
-  },
-  contentSection: {
-    flexDirection: 'row',
-    flex: 1,
-  },
-  verticalRule: {
-    width: 0.5,
-    backgroundColor: '#d1d1d1',
-    marginRight: 16,
-  },
-  textContent: {
-    flex: 1,
-  },
-  locationText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Bold',
-    color: '#1a1c1c',
-    lineHeight: 22,
-  },
-  bodyText: {
-    fontSize: 14,
-    fontFamily: 'Inter-Regular',
-    color: '#333333',
-    lineHeight: 21,
-  },
-  authorSection: {
-    marginTop: 20,
-  },
-  authorLine: {
-    width: 40,
-    height: 1,
-    backgroundColor: '#1a1c1c',
-    marginBottom: 8,
-  },
-  authorText: {
-    fontSize: 12,
-    fontFamily: 'Inter-Italic',
-    color: '#666666',
-  },
-  pageFooter: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 20,
-    paddingTop: 16,
-    // No-Line Rule: Removed border
-  },
-  pageNumber: {
-    fontSize: 12,
-    fontFamily: 'Inter-Bold',
-    color: '#9a9a9a',
-  },
-  socialIcons: {
-    flexDirection: 'row',
-    gap: 16,
-  },
-  swipeIndicator: {
-    paddingVertical: 15,
-    alignItems: 'center',
-    backgroundColor: '#ffffff',
-  },
-  swipeText: {
-    fontSize: 11,
-    color: '#9a9a9a',
-    fontFamily: 'Inter-Medium',
-    marginBottom: 8,
-  },
-  dotsRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 6,
-    backgroundColor: '#f5f5f7',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 20,
-  },
-  dot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#e0e0e0',
-  },
-  dotActive: {
-    backgroundColor: '#1a1c1c',
-    width: 12,
-  },
-  endOfEdition: {
-    ...StyleSheet.absoluteFillObject,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 40,
-  },
-  endText: {
-    fontSize: 18,
-    fontFamily: 'ClashDisplay-Bold',
-    color: '#1a1c1c',
-    textAlign: 'center',
-    marginTop: 16,
-    marginBottom: 24,
-  },
-  resetBtn: {
-    backgroundColor: '#1a1c1c',
-    paddingHorizontal: 24,
-    paddingVertical: 12,
-    borderRadius: 12,
-  },
-  resetBtnText: {
-    color: '#ffffff',
-    fontFamily: 'Inter-Bold',
-  },
-  viewDetailsBtn: {
-    backgroundColor: '#1a1c1c',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 12,
-    borderRadius: 8,
-    marginTop: 20,
-    alignSelf: 'stretch',
-    gap: 6,
-  },
-  viewDetailsText: {
-    color: '#ffffff',
-    fontSize: 10,
-    fontFamily: 'Inter-Bold',
-    letterSpacing: 1,
-  },
-  detailOverlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: '#ffffff',
-    zIndex: 1000,
-  },
-  detailContainer: {
-    flex: 1,
-  },
-  detailHeader: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 16,
-    height: 64,
-    // No-Line Rule: Removed border
-  },
-  detailHeaderTitle: {
-    fontSize: 12,
-    fontFamily: 'ClashDisplay-Bold',
-    letterSpacing: 2,
-    color: '#1a1c1c',
-  },
-  closeBtn: {
-    width: 44,
-    height: 44,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  detailContent: {
-    flex: 1,
-    padding: 24,
-  },
-  detailCategory: {
-    fontSize: 12,
-    fontFamily: 'Inter-Bold',
-    color: '#666666',
-    letterSpacing: 1,
-    marginBottom: 8,
-  },
-  detailTitle: {
-    fontSize: 32,
-    fontFamily: 'ClashDisplay-Bold',
-    color: '#1a1c1c',
-    lineHeight: 36,
-    marginBottom: 16,
-  },
-  detailDivider: {
-    width: 60,
-    height: 4,
-    backgroundColor: '#1a1c1c',
-    marginBottom: 24,
-  },
-  detailHeadline: {
-    fontSize: 18,
-    fontFamily: 'Inter-Bold',
-    color: '#1a1c1c',
-    lineHeight: 26,
-    marginBottom: 20,
-  },
-  detailFullText: {
-    fontSize: 16,
-    fontFamily: 'Inter-Regular',
-    color: '#333333',
-    lineHeight: 26,
-  },
-  detailFooter: {
-    marginTop: 'auto',
-    paddingTop: 24,
-    // No-Line Rule: Removed border
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  detailAuthor: {
-    fontSize: 12,
-    fontFamily: 'Inter-Bold',
-    color: '#1a1c1c',
-  },
-  detailDate: {
-    fontSize: 12,
-    fontFamily: 'Inter-Regular',
-    color: '#666666',
-  },
+  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  newsStack: { flex: 1, position: 'relative', overflow: 'hidden', padding: 16 },
+  pageContainer: { position: 'absolute', top: 16, left: 16, right: 16, bottom: 16 },
+  paperContent: { backgroundColor: '#ffffff', flex: 1, borderRadius: 20, padding: 24, shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.08, shadowRadius: 16, elevation: 6 },
+  masthead: { alignItems: 'center', marginBottom: 20 },
+  mastheadTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', letterSpacing: 2, marginBottom: 8 },
+  mastheadDivider: { width: '80%', height: 1, backgroundColor: '#e0e0e0', marginVertical: 6 },
+  mastheadMeta: { flexDirection: 'row', justifyContent: 'space-between', width: '100%', paddingHorizontal: 4 },
+  metaText: { fontSize: 10, fontFamily: 'Inter-Bold', color: '#777777', letterSpacing: 0.5 },
+  mainHeadline: { fontSize: 24, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', lineHeight: 28, marginBottom: 16, textAlign: 'center' },
+  contentSection: { flexDirection: 'row', flex: 1 },
+  verticalRule: { width: 3, backgroundColor: '#1a1c1c', marginRight: 14, borderRadius: 2 },
+  textContent: { flex: 1 },
+  locationText: { fontSize: 12, fontFamily: 'Inter-Medium', color: '#777777', lineHeight: 18, marginBottom: 12 },
+  bodyText: { fontSize: 14, fontFamily: 'Inter-Regular', color: '#474747', lineHeight: 20 },
+  authorSection: { marginTop: 16 },
+  authorLine: { width: 30, height: 2, backgroundColor: '#1a1c1c', marginBottom: 6 },
+  authorText: { fontSize: 11, fontFamily: 'Inter-Medium', color: '#5f5e5e' },
+  pageFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16, paddingTop: 16, borderTopWidth: 1, borderTopColor: '#f0f0f0' },
+  pageNumber: { fontSize: 11, fontFamily: 'Inter-Medium', color: '#9a9a9a' },
+  socialIcons: { flexDirection: 'row', gap: 16 },
+  swipeIndicator: { paddingVertical: 14, alignItems: 'center', backgroundColor: '#fcfcfc' },
+  swipeText: { fontSize: 11, color: '#999999', fontFamily: 'Inter-Medium', marginBottom: 10 },
+  dotsRow: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: '#f0f0f0', paddingHorizontal: 16, paddingVertical: 8, borderRadius: 999 },
+  dot: { width: 6, height: 6, borderRadius: 3, backgroundColor: '#cccccc' },
+  dotActive: { backgroundColor: '#1a1c1c', width: 12 },
+  endOfEdition: { ...StyleSheet.absoluteFill, justifyContent: 'center', alignItems: 'center', padding: 40 },
+  endText: { fontSize: 18, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', textAlign: 'center', marginTop: 16, marginBottom: 24 },
+  resetBtn: { backgroundColor: '#1a1c1c', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  resetBtnText: { color: '#ffffff', fontFamily: 'Inter-Bold' },
+  viewDetailsBtn: { backgroundColor: '#1a1c1c', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', paddingHorizontal: 20, paddingVertical: 12, borderRadius: 10, marginTop: 16, alignSelf: 'stretch', gap: 6 },
+  viewDetailsText: { color: '#ffffff', fontSize: 12, fontFamily: 'Inter-Semibold' },
+  detailContent: { flex: 1, padding: 24 },
+  detailCategory: { fontSize: 10, fontFamily: 'Inter-Bold', color: '#777777', letterSpacing: 1.5, marginBottom: 8 },
+  detailTitle: { fontSize: 24, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', lineHeight: 28, marginBottom: 16 },
+  detailDivider: { width: 40, height: 3, backgroundColor: '#1a1c1c', marginBottom: 20 },
+  detailHeadline: { fontSize: 18, fontFamily: 'CabinetGrotesk-Bold', color: '#1a1c1c', lineHeight: 24, marginBottom: 16 },
+  detailFullText: { fontSize: 14, fontFamily: 'Inter-Regular', color: '#474747', lineHeight: 22 },
+  detailFooter: { marginTop: 'auto', paddingTop: 24, borderTopWidth: 1, borderTopColor: '#f0f0f0', flexDirection: 'row', justifyContent: 'space-between' },
+  detailAuthor: { fontSize: 12, fontFamily: 'Inter-Medium', color: '#1a1c1c' },
+  detailDate: { fontSize: 12, fontFamily: 'Inter-Regular', color: '#999999' },
 });
+

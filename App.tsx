@@ -1,60 +1,63 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { StyleSheet, View, Animated } from 'react-native';
-import { SafeAreaProvider } from 'react-native-safe-area-context';
+import React from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold } from '@expo-google-fonts/inter';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { View, ActivityIndicator, StyleSheet } from 'react-native';
+
+import { AppProvider } from './src/context/AppContext';
+import ErrorBoundary from './src/components/ErrorBoundary';
+import type { RootStackParamList } from './src/types';
 
 import LoginPage from './src/LoginPage';
-import Dashboard from './src/Dashboard';
-import ProfilePage from './src/ProfilePage';
+import MainTabs from './src/navigation/MainTabs';
 import Hamburger from './src/Hamburger';
+import ProfilePage from './src/ProfilePage';
 import AccountSettings from './src/AccountSettings';
 import ChangePassword from './src/ChangePassword';
 import SecurityPrivacy from './src/SecurityPrivacy';
 import Notifications from './src/Notifications';
-import Hackathons from './src/Hackathons';
-import News from './src/News';
-import Courses from './src/Courses';
 import TermsAndConditions from './src/TermsAndConditions';
 import UploadHackathon from './src/UploadHackathon';
 import UploadCourse from './src/UploadCourse';
 import UploadLecture from './src/UploadLecture';
+import { useAppContext } from './src/context/AppContext';
 
-type ViewKey = 'login' | 'dashboard' | 'profile' | 'settings' | 'changePassword' | 'securityPrivacy' | 'notifications' | 'hackathons' | 'news' | 'courses' | 'terms' | 'uploadHackathon' | 'uploadCourse' | 'uploadLecture';
+const Stack = createNativeStackNavigator<RootStackParamList>();
+
+function AppContent() {
+  const { isMenuVisible } = useAppContext();
+
+  return (
+    <View style={{ flex: 1 }}>
+      <NavigationContainer>
+        <StatusBar style="auto" />
+        <Stack.Navigator
+          initialRouteName="Login"
+          screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
+        >
+          <Stack.Screen name="Login" component={LoginPage} />
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Profile" component={ProfilePage} />
+          <Stack.Screen name="AccountSettings" component={AccountSettings} />
+          <Stack.Screen name="ChangePassword" component={ChangePassword} />
+          <Stack.Screen name="SecurityPrivacy" component={SecurityPrivacy} />
+          <Stack.Screen name="Notifications" component={Notifications} />
+          <Stack.Screen name="Terms" component={TermsAndConditions} />
+          <Stack.Screen name="UploadHackathon" component={UploadHackathon} />
+          <Stack.Screen name="UploadCourse" component={UploadCourse} />
+          <Stack.Screen name="UploadLecture" component={UploadLecture} />
+        </Stack.Navigator>
+
+        {isMenuVisible && <Hamburger />}
+      </NavigationContainer>
+    </View>
+  );
+}
 
 export default function App() {
-  const [view, setView] = useState<ViewKey>('login');
-  const [isMenuVisible, setIsMenuVisible] = useState(false);
-  const [email, setEmail] = useState('');
-  const [userName, setUserName] = useState('');
-  const [userCollege, setUserCollege] = useState('');
-  const [userYear, setUserYear] = useState('');
-  const [userMobile, setUserMobile] = useState('');
-  const [userAddress, setUserAddress] = useState('');
-  const [userDob, setUserDob] = useState('');
-  const [isProfileComplete, setIsProfileComplete] = useState(false);
-
-  const fadeAnim = useRef(new Animated.Value(0)).current;
-  const slideAnim = useRef(new Animated.Value(10)).current;
-
-  useEffect(() => {
-    fadeAnim.setValue(0);
-    slideAnim.setValue(10);
-    Animated.parallel([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 300,
-        useNativeDriver: true,
-      }),
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      })
-    ]).start();
-  }, [view]);
-
   const [fontsLoaded] = useFonts({
     'ClashDisplay-Bold': require('./src/assets/fonts/ClashDisplay-Bold.ttf'),
     'CabinetGrotesk-Medium': require('./src/assets/fonts/CabinetGrotesk-Medium.ttf'),
@@ -65,145 +68,25 @@ export default function App() {
     'Inter-Bold': Inter_700Bold,
   });
 
-  if (!fontsLoaded) return null;
-
-  const handleLoginComplete = (data: { email: string, name: string, college: string, year: string }) => {
-    setEmail(data.email);
-    setUserName(data.name);
-    setUserCollege(data.college);
-    setUserYear(data.year);
-    setView('dashboard');
-  };
+  if (!fontsLoaded) {
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" color="#1a1c1c" />
+      </View>
+    );
+  }
 
   return (
     <SafeAreaProvider>
-      <View style={styles.container}>
-        <StatusBar style="auto" />
-
-        <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-          {view === 'dashboard' ? (
-            <Dashboard
-              onLogout={() => setView('login')}
-              onProfileClick={() => setView('profile')}
-              onMenuClick={() => setIsMenuVisible(true)}
-              onNavigate={(screen) => setView(screen as ViewKey)}
-              userName={userName}
-              isProfileComplete={isProfileComplete}
-            />
-          ) : view === 'profile' ? (
-            <ProfilePage 
-              onBack={() => setView('dashboard')} 
-              userEmail={email} 
-              onContinue={() => setView('dashboard')}
-              userName={userName}
-              userCollege={userCollege}
-              onUpdateName={setUserName}
-              onProfileComplete={() => setIsProfileComplete(true)}
-              userMobile={userMobile}
-              userAddress={userAddress}
-              userDob={userDob}
-              onUpdateProfile={(data) => {
-                setUserName(data.fullName);
-                setUserMobile(data.mobile);
-                setUserAddress(data.address);
-                setUserDob(data.dob);
-                setUserCollege(data.college);
-              }}
-            />
-          ) : view === 'settings' ? (
-            <AccountSettings 
-              onBack={() => setView('dashboard')}
-              onNavigate={(screen) => setView(screen as ViewKey)}
-            />
-          ) : view === 'changePassword' ? (
-            <ChangePassword onBack={() => setView('settings')} />
-          ) : view === 'securityPrivacy' ? (
-            <SecurityPrivacy onBack={() => setView('dashboard')} />
-          ) : view === 'notifications' ? (
-            <Notifications onBack={() => setView('dashboard')} />
-          ) : view === 'hackathons' ? (
-            <Hackathons onBack={() => setView('dashboard')} />
-          ) : view === 'news' ? (
-            <News onBack={() => setView('dashboard')} />
-          ) : view === 'courses' ? (
-            <Courses onBack={() => setView('dashboard')} />
-          ) : view === 'terms' ? (
-            <TermsAndConditions 
-              onBack={() => setView('dashboard')}
-              onAccept={() => setView('dashboard')}
-            />
-          ) : view === 'uploadHackathon' ? (
-            <UploadHackathon onBack={() => setView('dashboard')} />
-          ) : view === 'uploadCourse' ? (
-            <UploadCourse onBack={() => setView('dashboard')} />
-          ) : view === 'uploadLecture' ? (
-            <UploadLecture onBack={() => setView('dashboard')} />
-          ) : (
-            <LoginPage 
-              onComplete={handleLoginComplete}
-              onTermsPress={() => setView('terms')}
-            />
-          )}
-        </Animated.View>
-
-        {isMenuVisible && (
-          <Hamburger
-            onBack={() => setIsMenuVisible(false)}
-            onLogout={() => {
-              setIsMenuVisible(false);
-              setView('login');
-            }}
-            onProfileClick={() => {
-              setIsMenuVisible(false);
-              setView('profile');
-            }}
-            onSettingsClick={() => {
-              setIsMenuVisible(false);
-              setView('settings');
-            }}
-            onSecurityClick={() => {
-              setIsMenuVisible(false);
-              setView('securityPrivacy');
-            }}
-            onNotificationsClick={() => {
-              setIsMenuVisible(false);
-              setView('notifications');
-            }}
-            onHackathonsClick={() => {
-              setIsMenuVisible(false);
-              setView('hackathons');
-            }}
-            onNewsClick={() => {
-              setIsMenuVisible(false);
-              setView('news');
-            }}
-            onCoursesClick={() => {
-              setIsMenuVisible(false);
-              setView('courses');
-            }}
-            onDashboardClick={() => {
-              setIsMenuVisible(false);
-              setView('dashboard');
-            }}
-            onTermsClick={() => {
-              setIsMenuVisible(false);
-              setView('terms');
-            }}
-            currentView={view}
-            userEmail={email}
-            userName={userName}
-          />
-        )}
-      </View>
+      <ErrorBoundary>
+        <AppProvider>
+          <AppContent />
+        </AppProvider>
+      </ErrorBoundary>
     </SafeAreaProvider>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#f9f9f9',
-  },
+  loading: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: '#f9f9f9' },
 });
-
-
