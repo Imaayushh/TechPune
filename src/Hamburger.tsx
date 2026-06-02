@@ -1,17 +1,18 @@
-import { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   ScrollView,
   Dimensions,
-  TouchableWithoutFeedback,
+  TouchableOpacity,
   Alert,
   Animated,
   Keyboard,
-  Pressable,
+  Modal,
+  TouchableWithoutFeedback,
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Heroicon, type IconName } from './Heroicon';
@@ -19,13 +20,12 @@ import { useAppContext } from './context/AppContext';
 import type { RootStackParamList } from './types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
-const DRAWER_WIDTH = SCREEN_WIDTH * 0.78;
+const DRAWER_WIDTH = Math.min(SCREEN_WIDTH * 0.78, 320); // Cap width on tablets
 
 type MenuItem = {
   title: string;
   icon: IconName;
-  target: keyof RootStackParamList | 'logout';
-  logout?: boolean;
+  target: string;
 };
 
 const MAIN_ITEMS: MenuItem[] = [
@@ -51,97 +51,124 @@ const SUPPORT_ITEMS: MenuItem[] = [
 
 export default function Hamburger() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { user, resetUser, setMenuVisible } = useAppContext();
+  const { user, resetUser, isMenuVisible, setMenuVisible } = useAppContext();
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
+  const insets = useSafeAreaInsets();
+  
+  // Track if we are currently animating out so we don't trigger multiple closes
+  const [isClosing, setIsClosing] = useState(false);
 
   useEffect(() => {
+    // Animate in when mounted
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 1, duration: 250, useNativeDriver: true }),
       Animated.spring(slideAnim, { toValue: 0, tension: 50, friction: 10, useNativeDriver: true }),
     ]).start();
   }, []);
 
-  const close = () => {
+  const close = (onClosed?: () => void) => {
+    if (isClosing) return;
+    setIsClosing(true);
     Keyboard.dismiss();
     Animated.parallel([
       Animated.timing(fadeAnim, { toValue: 0, duration: 200, useNativeDriver: true }),
       Animated.timing(slideAnim, { toValue: -DRAWER_WIDTH, duration: 250, useNativeDriver: true }),
-    ]).start(() => setMenuVisible(false));
+    ]).start(() => {
+      setMenuVisible(false);
+      if (onClosed) onClosed();
+    });
   };
 
-  const navigateTo = (target: keyof RootStackParamList) => {
-    close();
-    if (target === 'Dashboard') {
-      navigation.reset({ index: 0, routes: [{ name: 'MainTabs' }] });
-    } else {
-      navigation.navigate(target);
-    }
+  const navigateTo = (target: string) => {
+    close(() => {
+      const mainTabs = ['Dashboard', 'Hackathons', 'News', 'Courses'];
+      if (mainTabs.includes(target)) {
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'MainTabs', params: { screen: target } } as any],
+        });
+      } else {
+        navigation.navigate(target as any);
+      }
+    });
   };
 
   const handleLogout = () => {
-    close();
-    Alert.alert("Sign Out", "Are you sure you want to log out?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Sign Out",
-        onPress: () => {
-          resetUser();
-          navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+    close(() => {
+      Alert.alert("Sign Out", "Are you sure you want to log out?", [
+        { text: "Cancel", style: "cancel" },
+        {
+          text: "Sign Out",
+          onPress: () => {
+            resetUser();
+            navigation.reset({ index: 0, routes: [{ name: 'Login' }] });
+          },
         },
-      },
-    ]);
+      ]);
+    });
   };
 
   return (
-    <View style={styles.overlay}>
-      <TouchableWithoutFeedback onPress={close}>
-        <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
-      </TouchableWithoutFeedback>
+    <Modal
+      visible={true} // Controlled by conditional rendering in App.tsx
+      transparent={true}
+      animationType="none"
+      onRequestClose={() => close()}
+      statusBarTranslucent={true}
+    >
+      <View style={styles.overlay}>
+        <TouchableWithoutFeedback onPress={() => close()}>
+          <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]} />
+        </TouchableWithoutFeedback>
 
-      <Animated.View style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}>
-        <SafeAreaView style={styles.safeArea}>
-          <View style={styles.header}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarLetter}>
-                {(user.fullName || 'U').charAt(0).toUpperCase()}
-              </Text>
+        <Animated.View 
+          style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}
+          pointerEvents="box-none" // Ensures touches go to children
+        >
+          <View style={[styles.drawerContent, { paddingTop: insets.top, paddingBottom: insets.bottom }]}>
+            <View style={styles.header}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarLetter}>
+                  {(user.fullName || 'U').charAt(0).toUpperCase()}
+                </Text>
+              </View>
+              <View style={styles.headerText}>
+                <Text style={styles.userName} numberOfLines={1}>
+                  {user.fullName || 'User'}
+                </Text>
+                <Text style={styles.userEmail} numberOfLines={1}>
+                  {user.email || 'user@techpune.com'}
+                </Text>
+              </View>
             </View>
-            <View style={styles.headerText}>
-              <Text style={styles.userName} numberOfLines={1}>
-                {user.fullName || 'User'}
-              </Text>
-              <Text style={styles.userEmail} numberOfLines={1}>
-                {user.email || 'user@techpune.com'}
-              </Text>
-            </View>
-          </View>
-
-          <View style={styles.divider} />
-
-          <ScrollView
-            contentContainerStyle={styles.scrollContent}
-            showsVerticalScrollIndicator={false}
-          >
-            <MenuSection title="MAIN MENU" items={MAIN_ITEMS} onPress={navigateTo} />
-            <MenuSection title="ACCOUNT" items={ACCOUNT_ITEMS} onPress={navigateTo} />
-            <MenuSection title="SETTINGS" items={SETTINGS_ITEMS} onPress={navigateTo} />
-            <MenuSection title="SUPPORT" items={SUPPORT_ITEMS} onPress={navigateTo} />
 
             <View style={styles.divider} />
 
-            <MenuItemRow
-              icon="logout"
-              title="Log Out"
-              color="#ff4b4b"
-              onPress={handleLogout}
-            />
-          </ScrollView>
+            <ScrollView
+              contentContainerStyle={styles.scrollContent}
+              showsVerticalScrollIndicator={false}
+              keyboardShouldPersistTaps="always"
+              bounces={false}
+            >
+              <MenuSection title="MAIN MENU" items={MAIN_ITEMS} onPress={navigateTo} />
+              <MenuSection title="ACCOUNT" items={ACCOUNT_ITEMS} onPress={navigateTo} />
+              <MenuSection title="SETTINGS" items={SETTINGS_ITEMS} onPress={navigateTo} />
+              <MenuSection title="SUPPORT" items={SUPPORT_ITEMS} onPress={navigateTo} />
 
+              <View style={styles.divider} />
 
-        </SafeAreaView>
-      </Animated.View>
-    </View>
+              <MenuItemRow
+                icon="logout"
+                title="Log Out"
+                color="#ff4b4b"
+                onPress={handleLogout}
+              />
+            </ScrollView>
+          </View>
+        </Animated.View>
+      </View>
+    </Modal>
   );
 }
 
@@ -152,7 +179,7 @@ function MenuSection({
 }: {
   title: string;
   items: MenuItem[];
-  onPress: (target: keyof RootStackParamList) => void;
+  onPress: (target: string) => void;
 }) {
   return (
     <View style={styles.section}>
@@ -162,7 +189,7 @@ function MenuSection({
           key={item.target}
           icon={item.icon}
           title={item.title}
-          onPress={() => onPress(item.target as keyof RootStackParamList)}
+          onPress={() => onPress(item.target)}
           showChevron
         />
       ))}
@@ -184,12 +211,10 @@ function MenuItemRow({
   showChevron?: boolean;
 }) {
   return (
-    <Pressable
+    <TouchableOpacity
+      activeOpacity={0.7}
       onPress={onPress}
-      style={({ pressed }) => [
-        styles.menuRow,
-        pressed && styles.menuRowPressed,
-      ]}
+      style={styles.menuRow}
     >
       <View style={[styles.iconBox, color ? { backgroundColor: 'rgba(255, 75, 75, 0.12)' } : undefined]}>
         <Heroicon name={icon} size={18} color={color || '#e0e0e0'} />
@@ -202,30 +227,28 @@ function MenuItemRow({
           <Heroicon name="chevron-right" size={14} color="#555555" />
         </View>
       )}
-    </Pressable>
+    </TouchableOpacity>
   );
 }
 
 const styles = StyleSheet.create({
   overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
-    zIndex: 1000,
+    flex: 1,
   },
   backdrop: {
     position: 'absolute',
     top: 0,
     left: 0,
-    width: SCREEN_WIDTH,
-    height: SCREEN_HEIGHT,
+    right: 0,
+    bottom: 0,
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
   },
   drawer: {
+    position: 'absolute',
+    left: 0,
+    top: 0,
+    bottom: 0,
     width: DRAWER_WIDTH,
-    height: SCREEN_HEIGHT,
     backgroundColor: '#1a1c1c',
     shadowColor: '#000',
     shadowOffset: { width: 10, height: 0 },
@@ -233,7 +256,7 @@ const styles = StyleSheet.create({
     shadowRadius: 20,
     elevation: 20,
   },
-  safeArea: {
+  drawerContent: {
     flex: 1,
   },
   header: {
@@ -302,9 +325,6 @@ const styles = StyleSheet.create({
     borderRadius: 14,
     marginBottom: 2,
   },
-  menuRowPressed: {
-    backgroundColor: 'rgba(255, 255, 255, 0.08)',
-  },
   iconBox: {
     width: 34,
     height: 34,
@@ -325,5 +345,4 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-
 });
