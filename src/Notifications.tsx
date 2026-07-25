@@ -1,39 +1,32 @@
-﻿import React, { useState } from 'react';
+﻿import React, { useState, useEffect } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   ScrollView,
-  Switch,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Heroicon, type IconName } from './Heroicon';
 import { useFadeIn } from './hooks/useFadeIn';
+import ToggleRow from './components/ToggleRow';
 import PageHeader from './components/PageHeader';
+import { loadSettings, saveSettings, type AppSettings } from './services/settingsService';
+import { colors } from './constants/theme';
 
 export default function Notifications() {
-  const [pushEnabled, setPushEnabled] = useState(true);
-  const [emailEnabled, setEmailEnabled] = useState(false);
-  const [newsletters, setNewsletters] = useState(true);
-  const [mentions, setMentions] = useState(true);
+  const [settings, setSettings] = useState<AppSettings>({});
+
+  useEffect(() => {
+    loadSettings().then(setSettings);
+  }, []);
+
+  const update = (key: keyof AppSettings) => (value: boolean) => {
+    const next = { ...settings, [key]: value };
+    setSettings(next);
+    saveSettings(next);
+  };
 
   const { fadeAnim, slideAnim } = useFadeIn({ duration: 400, slideFrom: 20 });
-
-  const ToggleRow = ({
-    icon, title, description, value, onValueChange,
-  }: {
-    icon: IconName; title: string; description?: string; value: boolean; onValueChange: (v: boolean) => void;
-  }) => (
-    <View style={styles.row}>
-      <View style={styles.iconContainer}><Heroicon name={icon} size={18} color="#9a9a9a" /></View>
-      <View style={styles.rowContent}>
-        <Text style={styles.rowTitle}>{title}</Text>
-        {description && <Text style={styles.rowDescription}>{description}</Text>}
-      </View>
-      <Switch value={value} onValueChange={onValueChange} trackColor={{ false: '#e0e0e0', true: '#1a1c1c' }} thumbColor={value ? '#ffffff' : '#9a9a9a'} ios_backgroundColor="#e0e0e0" />
-    </View>
-  );
 
   return (
     <SafeAreaView style={styles.container}>
@@ -44,17 +37,17 @@ export default function Notifications() {
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>PUSH NOTIFICATIONS</Text>
             <View style={styles.card}>
-              <ToggleRow icon="bell" title="All Push Notifications" description="Receive real-time alerts on your device" value={pushEnabled} onValueChange={setPushEnabled} />
+              <ToggleRow icon="bell" title="All Push Notifications" description="Receive real-time alerts on your device" value={settings.pushEnabled ?? true} onValueChange={update('pushEnabled')} />
               <View style={styles.divider} />
-              <ToggleRow icon="star" title="Mentions & Tags" description="Get notified when someone mentions you" value={mentions} onValueChange={setMentions} />
+              <ToggleRow icon="star" title="Mentions & Tags" description="Get notified when someone mentions you" value={settings.mentions ?? true} onValueChange={update('mentions')} />
             </View>
           </View>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>EMAIL & NEWS</Text>
             <View style={styles.card}>
-              <ToggleRow icon="mail" title="Email Notifications" description="Receive summaries and updates via email" value={emailEnabled} onValueChange={setEmailEnabled} />
+              <ToggleRow icon="mail" title="Email Notifications" description="Receive summaries and updates via email" value={settings.emailEnabled ?? false} onValueChange={update('emailEnabled')} />
               <View style={styles.divider} />
-              <ToggleRow icon="book-open" title="Weekly Newsletters" description="Best stories and updates from TechPune" value={newsletters} onValueChange={setNewsletters} />
+              <ToggleRow icon="book-open" title="Weekly Newsletters" description="Best stories and updates from TechPune" value={settings.newsletters ?? true} onValueChange={update('newsletters')} />
             </View>
           </View>
           <View style={styles.infoBox}>
@@ -67,18 +60,13 @@ export default function Notifications() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20 },
   section: { marginBottom: 32 },
-  sectionTitle: { fontSize: 10, fontFamily: 'Inter-Bold', color: '#9a9a9a', letterSpacing: 1.5, marginBottom: 16, marginLeft: 4 },
-  card: { backgroundColor: '#ffffff', borderRadius: 20, paddingVertical: 8 },
-  row: { flexDirection: 'row', alignItems: 'center', padding: 16, paddingVertical: 18 },
-  iconContainer: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f5f5f7', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
-  rowContent: { flex: 1, marginRight: 12 },
-  rowTitle: { fontSize: 15, fontFamily: 'Inter-Semibold', color: '#1a1c1c' },
-  rowDescription: { fontSize: 12, fontFamily: 'Inter-Medium', color: '#666666', marginTop: 2 },
-  divider: { height: 1, backgroundColor: '#f0f0f0', marginHorizontal: 16 },
-  infoBox: { padding: 20, backgroundColor: '#ffffff', borderRadius: 20, marginTop: 8 },
-  infoText: { fontSize: 12, fontFamily: 'Inter-Medium', color: '#666666', textAlign: 'center', lineHeight: 18 },
+  sectionTitle: { fontSize: 10, fontFamily: 'Inter-Bold', color: colors.textMuted, letterSpacing: 1.5, marginBottom: 16, marginLeft: 4 },
+  card: { backgroundColor: colors.surface, borderRadius: 20, paddingVertical: 8 },
+  divider: { height: 1, backgroundColor: colors.divider, marginHorizontal: 16 },
+  infoBox: { padding: 20, backgroundColor: colors.surface, borderRadius: 20, marginTop: 8 },
+  infoText: { fontSize: 12, fontFamily: 'Inter-Medium', color: colors.textSubtitle, textAlign: 'center', lineHeight: 18 },
 });
 

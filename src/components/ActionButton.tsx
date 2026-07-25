@@ -1,5 +1,6 @@
 import { StyleSheet, TouchableOpacity, Text, type ViewStyle } from 'react-native';
 import { Heroicon } from '../Heroicon';
+import { colors } from '../constants/theme';
 
 type ActionButtonProps = {
   label: string;
@@ -19,7 +20,7 @@ export default function ActionButton({ label, icon = 'arrow-right', onPress, sty
 
 const styles = StyleSheet.create({
   button: {
-    backgroundColor: '#1a1c1c',
+    backgroundColor: colors.primary,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
@@ -29,7 +30,7 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   label: {
-    color: '#ffffff',
+    color: colors.white,
     fontSize: 12,
     fontFamily: 'Inter-Bold',
   },

@@ -1,4 +1,4 @@
-import React, { useMemo, useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   StyleSheet,
   View,
@@ -15,17 +15,28 @@ import {
 import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import * as WebBrowser from 'expo-web-browser';
+import * as AuthSession from 'expo-auth-session';
+
 import { Heroicon } from './Heroicon';
 import { useAppContext } from './context/AppContext';
 import { PUNE_COLLEGES } from './constants/colleges';
+import { colors } from './constants/theme';
+import { useResponsive } from './hooks/useResponsive';
 import type { RootStackParamList } from './types';
+import { supabase } from './lib/supabase';
 
-type Step = 'email' | 'identity' | 'academic' | 'complete';
+// This is needed for expo-web-browser
+WebBrowser.maybeCompleteAuthSession();
+
+type Step = 'auth' | 'identity' | 'academic' | 'complete';
 
 export default function LoginPage() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { updateUser } = useAppContext();
-  const [step, setStep] = useState<Step>('email');
+  const { sp, fs } = useResponsive();
+  const [step, setStep] = useState<Step>('auth');
+  
   const [email, setEmail] = useState('');
   const [name, setName] = useState('');
   const [college, setCollege] = useState('');
@@ -34,10 +45,9 @@ export default function LoginPage() {
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const slideAnim = useRef(new Animated.Value(0)).current;
 
-  const canSubmitEmail = useMemo(() => email.trim().length > 0 && email.includes('@'), [email]);
-  const canSubmitIdentity = useMemo(() => name.trim().length > 0, [name]);
+  const canSubmitIdentity = name.trim().length > 0;
 
-  const stepOrder: Step[] = ['email', 'identity', 'academic', 'complete'];
+  const stepOrder: Step[] = ['auth', 'identity', 'academic', 'complete'];
 
   const animateToStep = (nextStep: Step) => {
     const currentIdx = stepOrder.indexOf(step);
@@ -59,12 +69,64 @@ export default function LoginPage() {
     });
   };
 
-  const handleEmailSubmit = () => {
-    if (!canSubmitEmail) {
-      Alert.alert('Error', 'Please enter a valid email address');
-      return;
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setEmail(session.user.email || '');
+        setName(session.user.user_metadata?.full_name || '');
+        animateToStep('identity');
+      }
+    });
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session && step === 'auth') {
+        setEmail(session.user.email || '');
+        setName(session.user.user_metadata?.full_name || '');
+        animateToStep('identity');
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleOAuthLogin = async (provider: 'google' | 'github') => {
+    try {
+      const redirectUri = AuthSession.makeRedirectUri();
+      const { data, error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          redirectTo: redirectUri,
+          skipBrowserRedirect: true,
+        },
+      });
+
+      if (error) throw error;
+      if (!data?.url) throw new Error('No redirect URL returned');
+
+      const result = await WebBrowser.openAuthSessionAsync(data.url, redirectUri);
+      
+      if (result.type === 'success') {
+        // Parse the URL to get the hash or query params
+        const urlParams = new URL(result.url);
+        const hashParams = new URLSearchParams(urlParams.hash.replace('#', '?'));
+        
+        const accessToken = hashParams.get('access_token') || urlParams.searchParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token') || urlParams.searchParams.get('refresh_token');
+
+        if (accessToken && refreshToken) {
+          const { error: sessionError } = await supabase.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken,
+          });
+          if (sessionError) throw sessionError;
+        } else {
+           // Fallback for some flows where Supabase handles the session natively through deep links
+           // We'll let the onAuthStateChange listener handle it if the session is picked up
+        }
+      }
+    } catch (error: any) {
+      Alert.alert('Authentication Error', error.message);
     }
-    animateToStep('identity');
   };
 
   const handleComplete = () => {
@@ -74,53 +136,26 @@ export default function LoginPage() {
 
   const [showCollegePicker, setShowCollegePicker] = useState(false);
 
-  const renderEmailStep = () => (
+  const renderAuthStep = () => (
     <View style={styles.card}>
       <Text style={styles.cardTitle}>Join our community Today.</Text>
       <View style={styles.form}>
-        <Text style={styles.label}>Email Address</Text>
-        <View style={styles.inputShell}>
-          <TextInput
-            style={styles.input}
-            placeholder="email id"
-            value={email}
-            onChangeText={setEmail}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoCorrect={false}
-            placeholderTextColor="#9a9a9a"
-          />
-        </View>
-
-        <TouchableOpacity
-          style={[styles.primaryButton, !canSubmitEmail && styles.primaryButtonDisabled]}
-          onPress={handleEmailSubmit}
-          activeOpacity={0.85}
-        >
-          <Text style={styles.primaryButtonText}>Sign In</Text>
-        </TouchableOpacity>
-
-        <View style={styles.orRow}>
-          <View style={styles.orSpacer} />
-          <Text style={styles.orText}>OR</Text>
-          <View style={styles.orSpacer} />
-        </View>
-
+        
         <View style={styles.socialStack}>
           <TouchableOpacity
             style={styles.secondaryButton}
             activeOpacity={0.8}
-            onPress={() => Alert.alert('Coming Soon', 'Google Sign-In is not available yet.')}
+            onPress={() => handleOAuthLogin('google')}
           >
-            <Heroicon name="google" size={20} color="#1a1c1c" />
+            <Heroicon name="google" size={20} color={colors.primary} />
             <Text style={styles.secondaryButtonText}>Continue with Google</Text>
           </TouchableOpacity>
           <TouchableOpacity
             style={styles.secondaryButton}
             activeOpacity={0.8}
-            onPress={() => Alert.alert('Coming Soon', 'GitHub Sign-In is not available yet.')}
+            onPress={() => handleOAuthLogin('github')}
           >
-            <Heroicon name="github" size={20} color="#1a1c1c" />
+            <Heroicon name="github" size={20} color={colors.primary} />
             <Text style={styles.secondaryButtonText}>Continue with GitHub</Text>
           </TouchableOpacity>
         </View>
@@ -160,6 +195,7 @@ export default function LoginPage() {
           style={[styles.primaryButton, !canSubmitIdentity && styles.primaryButtonDisabled, { width: '100%' }]}
           onPress={() => animateToStep('academic')}
           activeOpacity={0.85}
+          disabled={!canSubmitIdentity}
         >
           <Text style={styles.primaryButtonText}>Continue</Text>
         </TouchableOpacity>
@@ -231,7 +267,7 @@ export default function LoginPage() {
     <View style={styles.noCardContent}>
       <View style={[styles.centeredContent, { paddingVertical: 40 }]}>
         <View style={styles.iconCircle}>
-          <Heroicon name="check" size={32} color="#1a1c1c" />
+          <Heroicon name="check" size={32} color={colors.primary} />
         </View>
         <Text style={[styles.cardTitle, { textAlign: 'center' }]}>You're all set!</Text>
         <Text style={[styles.stepSubtitle, { textAlign: 'center', marginBottom: 30 }]}>
@@ -264,10 +300,10 @@ export default function LoginPage() {
           keyboardShouldPersistTaps="handled"
           showsVerticalScrollIndicator={false}
         >
-          {step !== 'email' && step !== 'complete' && (
+          {step !== 'auth' && step !== 'complete' && (
             <TouchableOpacity
               style={styles.topBackButton}
-              onPress={() => animateToStep(step === 'identity' ? 'email' : 'identity')}
+              onPress={() => animateToStep(step === 'identity' ? 'auth' : 'identity')}
             >
               <Heroicon name="chevron-left" size={20} color="#5f5e5e" />
               <Text style={styles.backText}>Back</Text>
@@ -282,7 +318,7 @@ export default function LoginPage() {
           </View>
 
           <Animated.View style={{ flex: 1, opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
-            {step === 'email' && renderEmailStep()}
+            {step === 'auth' && renderAuthStep()}
             {step === 'identity' && renderIdentityStep()}
             {step === 'academic' && renderAcademicStep()}
             {step === 'complete' && renderCompleteStep()}
@@ -294,57 +330,54 @@ export default function LoginPage() {
 }
 
 const styles = StyleSheet.create({
-  safeArea: { flex: 1, backgroundColor: '#fcfcfc' },
+  safeArea: { flex: 1, backgroundColor: colors.background },
   container: { flex: 1 },
   scrollContent: { flexGrow: 1, justifyContent: 'center', paddingHorizontal: 22, paddingVertical: 28 },
   brandBlock: { alignItems: 'center', marginBottom: 26 },
-  brandTitle: { fontSize: 34, color: '#1a1c1c', fontFamily: 'ClashDisplay-Bold', letterSpacing: 0.2 },
-  brandSubtitle: { marginTop: 8, fontSize: 14, color: '#5f5e5e', textAlign: 'center', fontFamily: 'Inter-Regular' },
+  brandTitle: { fontSize: 34, color: colors.primary, fontFamily: 'ClashDisplay-Bold', letterSpacing: 0.2 },
+  brandSubtitle: { marginTop: 8, fontSize: 14, color: colors.textLight, textAlign: 'center', fontFamily: 'Inter-Regular' },
   card: {
-    backgroundColor: '#ffffff', borderRadius: 20, paddingHorizontal: 22, paddingVertical: 26,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.04, shadowRadius: 20, elevation: 2,
+    backgroundColor: colors.surface, borderRadius: 20, paddingHorizontal: 22, paddingVertical: 26,
+    shadowColor: colors.black, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.04, shadowRadius: 20, elevation: 2,
   },
-  cardTitle: { fontSize: 38, lineHeight: 44, color: '#1a1c1c', fontFamily: 'ClashDisplay-Bold', marginBottom: 12 },
-  stepSubtitle: { fontSize: 15, color: '#5f5e5e', fontFamily: 'Inter-Regular', marginBottom: 8, lineHeight: 22 },
+  cardTitle: { fontSize: 38, lineHeight: 44, color: colors.primary, fontFamily: 'ClashDisplay-Bold', marginBottom: 12 },
+  stepSubtitle: { fontSize: 15, color: colors.textLight, fontFamily: 'Inter-Regular', marginBottom: 8, lineHeight: 22 },
   form: { marginTop: 2 },
-  label: { fontSize: 13, color: '#1a1c1c', fontFamily: 'CabinetGrotesk-Medium', marginBottom: 10 },
+  label: { fontSize: 13, color: colors.primary, fontFamily: 'CabinetGrotesk-Medium', marginBottom: 10 },
   inputShell: {
-    height: 56, borderRadius: 14, backgroundColor: '#f5f5f7', paddingHorizontal: 16,
+    height: 56, borderRadius: 14, backgroundColor: colors.inputBg, paddingHorizontal: 16,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16,
   },
-  input: { flex: 1, fontSize: 16, color: '#1a1c1c', fontFamily: 'Inter-Regular' },
-  primaryButton: { marginTop: 8, height: 58, borderRadius: 999, backgroundColor: '#1a1c1c', justifyContent: 'center', alignItems: 'center' },
+  input: { flex: 1, fontSize: 16, color: colors.primary, fontFamily: 'Inter-Regular' },
+  primaryButton: { marginTop: 8, height: 58, borderRadius: 999, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' },
   primaryButtonDisabled: { opacity: 0.55 },
   primaryButtonText: { color: '#e2e2e2', fontSize: 16, fontFamily: 'Inter-Semibold', letterSpacing: 0.2 },
-  orRow: { marginTop: 20, marginBottom: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
-  orSpacer: { flex: 1, height: 2, borderRadius: 999, backgroundColor: '#f0f0f0' },
-  orText: { fontSize: 12, color: '#5f5e5e', fontFamily: 'Inter-Medium', letterSpacing: 1.4 },
-  socialStack: { gap: 12 },
+  socialStack: { gap: 12, marginTop: 16, marginBottom: 16 },
   secondaryButton: {
     height: 56, borderRadius: 999, backgroundColor: '#f0f0f0', paddingHorizontal: 18,
     flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10,
   },
-  secondaryButtonText: { fontSize: 15, color: '#1a1c1c', fontFamily: 'Inter-Medium' },
-  termsText: { marginTop: 18, fontSize: 12, color: '#5f5e5e', textAlign: 'center', fontFamily: 'Inter-Regular' },
-  termsLink: { textDecorationLine: 'underline', color: '#1a1c1c', fontFamily: 'Inter-Medium' },
-  backText: { fontSize: 14, color: '#5f5e5e', fontFamily: 'Inter-Medium', marginLeft: 4 },
-  iconCircle: { width: 56, height: 56, borderRadius: 28, backgroundColor: '#f5f5f7', alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
+  secondaryButtonText: { fontSize: 15, color: colors.primary, fontFamily: 'Inter-Medium' },
+  termsText: { marginTop: 18, fontSize: 12, color: colors.textLight, textAlign: 'center', fontFamily: 'Inter-Regular' },
+  termsLink: { textDecorationLine: 'underline', color: colors.primary, fontFamily: 'Inter-Medium' },
+  backText: { fontSize: 14, color: colors.textLight, fontFamily: 'Inter-Medium', marginLeft: 4 },
+  iconCircle: { width: 56, height: 56, borderRadius: 28, backgroundColor: colors.surfaceTint, alignItems: 'center', justifyContent: 'center', marginBottom: 16 },
   noCardContent: { flex: 1, paddingTop: 10, minHeight: 400 },
   centeredContent: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingBottom: 40 },
   topBackButton: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', marginBottom: 10, paddingVertical: 5 },
   pickerHeader: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
   modalBackButton: { flexDirection: 'row', alignItems: 'center', width: 60 },
-  modalBackText: { fontSize: 14, color: '#5f5e5e', fontFamily: 'Inter-Medium', marginLeft: 2 },
+  modalBackText: { fontSize: 14, color: colors.textLight, fontFamily: 'Inter-Medium', marginLeft: 2 },
   modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'flex-end' },
   pickerContent: {
-    backgroundColor: '#ffffff', borderTopLeftRadius: 32, borderTopRightRadius: 32,
+    backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32,
     paddingTop: 12, paddingHorizontal: 22, paddingBottom: 40, maxHeight: '70%',
   },
-  pickerHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: '#f0f0f0', alignSelf: 'center', marginBottom: 20 },
-  pickerTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginBottom: 20, textAlign: 'center' },
+  pickerHandle: { width: 40, height: 4, borderRadius: 2, backgroundColor: colors.divider, alignSelf: 'center', marginBottom: 20 },
+  pickerTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginBottom: 20, textAlign: 'center' },
   pickerItem: { paddingVertical: 16 },
-  pickerItemText: { fontSize: 16, fontFamily: 'Inter-Medium', color: '#5f5e5e' },
-  pickerItemTextActive: { color: '#1a1c1c', fontFamily: 'Inter-Bold' },
+  pickerItemText: { fontSize: 16, fontFamily: 'Inter-Medium', color: colors.textLight },
+  pickerItemTextActive: { color: colors.primary, fontFamily: 'Inter-Bold' },
   completeContent: { marginBottom: 20 },
   summaryText: { fontFamily: 'Inter-Medium', fontSize: 15, color: '#444', lineHeight: 22 },
 });

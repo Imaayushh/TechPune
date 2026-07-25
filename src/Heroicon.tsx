@@ -1,6 +1,7 @@
 import React from 'react';
 import { Svg, Path } from 'react-native-svg';
 import { View } from 'react-native';
+import { colors } from './constants/theme';
 
 export type IconName =
   | 'home' | 'menu' | 'user'
@@ -78,7 +79,7 @@ const icons: Record<string, string> = {
 };
 
 export const Heroicon: React.FC<HeroiconProps> = React.memo(({
-  name, size = 24, color = '#1a1c1c', strokeWidth = 2,
+  name, size = 24, color = colors.primary, strokeWidth = 2,
 }) => {
   const path = icons[name];
   if (!path) {

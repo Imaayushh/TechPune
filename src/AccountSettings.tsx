@@ -12,12 +12,13 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { Heroicon, type IconName } from './Heroicon';
+import { Heroicon } from './Heroicon';
 import { BlurView } from 'expo-blur';
-import AnimatedPressable from './components/AnimatedPressable';
 import { useFadeIn } from './hooks/useFadeIn';
+import SettingRow from './components/SettingRow';
 import PageHeader from './components/PageHeader';
 import { useAppContext } from './context/AppContext';
+import { colors } from './constants/theme';
 import type { RootStackParamList } from './types';
 
 export default function AccountSettings() {
@@ -40,23 +41,6 @@ export default function AccountSettings() {
       modalOpacity.setValue(0);
     }
   }, [showDeleteModal]);
-
-  const SettingRow = ({
-    icon, title, description, onPress, isDanger = false, showArrow = true,
-  }: {
-    icon: IconName; title: string; description?: string; onPress: () => void; isDanger?: boolean; showArrow?: boolean;
-  }) => (
-    <AnimatedPressable style={styles.row} onPress={onPress}>
-      <View style={[styles.iconContainer, isDanger && styles.dangerIconContainer]}>
-        <Heroicon name={icon} size={18} color={isDanger ? '#ff4b4b' : '#9a9a9a'} />
-      </View>
-      <View style={styles.rowContent}>
-        <Text style={[styles.rowTitle, isDanger && styles.dangerText]}>{title}</Text>
-        {description && <Text style={styles.rowDescription}>{description}</Text>}
-      </View>
-      {showArrow && !isDanger && <Heroicon name="chevron-right" size={16} color="#333333" />}
-    </AnimatedPressable>
-  );
 
   const handleDeleteAccount = () => {
     setShowDeleteModal(false);
@@ -135,28 +119,21 @@ export default function AccountSettings() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20, paddingTop: 10 },
   section: { marginBottom: 32 },
-  sectionTitle: { fontSize: 10, fontFamily: 'Inter-Bold', color: '#9a9a9a', letterSpacing: 1.5, marginBottom: 16, marginLeft: 4 },
-  card: { backgroundColor: '#ffffff', borderRadius: 20, paddingVertical: 4 },
-  dangerCard: { borderWidth: 1, borderColor: 'rgba(255, 75, 75, 0.15)' },
-  row: { flexDirection: 'row', alignItems: 'center', padding: 16, paddingVertical: 18 },
-  iconContainer: { width: 36, height: 36, borderRadius: 10, backgroundColor: '#f5f5f7', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
-  dangerIconContainer: { backgroundColor: 'rgba(255, 75, 75, 0.1)' },
-  rowContent: { flex: 1 },
-  rowTitle: { fontSize: 15, fontFamily: 'Inter-Semibold', color: '#1a1c1c' },
-  rowDescription: { fontSize: 12, fontFamily: 'Inter-Medium', color: '#666666', marginTop: 2 },
-  dangerText: { color: '#ff4b4b' },
-  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'rgba(0, 0, 0, 0.5)', padding: 32 },
-  modalContent: { width: '100%', backgroundColor: '#ffffff', borderRadius: 28, padding: 24, alignItems: 'center' },
-  modalIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: 'rgba(255, 75, 75, 0.1)', justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
-  modalTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginBottom: 12 },
-  modalDescription: { fontSize: 14, fontFamily: 'Inter-Medium', color: '#666666', textAlign: 'center', lineHeight: 20, marginBottom: 24 },
+  sectionTitle: { fontSize: 10, fontFamily: 'Inter-Bold', color: colors.textMuted, letterSpacing: 1.5, marginBottom: 16, marginLeft: 4 },
+  card: { backgroundColor: colors.surface, borderRadius: 20, paddingVertical: 4 },
+  dangerCard: { borderWidth: 1, borderColor: colors.dangerBorder },
+  modalOverlay: { flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.overlay, padding: 32 },
+  modalContent: { width: '100%', backgroundColor: colors.surface, borderRadius: 28, padding: 24, alignItems: 'center' },
+  modalIcon: { width: 64, height: 64, borderRadius: 32, backgroundColor: colors.dangerBg, justifyContent: 'center', alignItems: 'center', marginBottom: 20 },
+  modalTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginBottom: 12 },
+  modalDescription: { fontSize: 14, fontFamily: 'Inter-Medium', color: colors.textSubtitle, textAlign: 'center', lineHeight: 20, marginBottom: 24 },
   modalActions: { flexDirection: 'row', gap: 12 },
-  cancelBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, backgroundColor: '#f5f5f7', alignItems: 'center' },
-  cancelText: { fontSize: 14, fontFamily: 'Inter-Bold', color: '#1a1c1c' },
-  deleteBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, backgroundColor: '#ff4b4b', alignItems: 'center' },
-  deleteText: { fontSize: 14, fontFamily: 'Inter-Bold', color: '#ffffff' },
+  cancelBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, backgroundColor: colors.surfaceTint, alignItems: 'center' },
+  cancelText: { fontSize: 14, fontFamily: 'Inter-Bold', color: colors.primary },
+  deleteBtn: { flex: 1, paddingVertical: 14, borderRadius: 14, backgroundColor: colors.danger, alignItems: 'center' },
+  deleteText: { fontSize: 14, fontFamily: 'Inter-Bold', color: colors.white },
 });
 

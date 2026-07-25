@@ -1,6 +1,7 @@
 import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Heroicon } from '../Heroicon';
+import { colors } from '../constants/theme';
 
 type DetailOverlayProps = {
   visible: boolean;
@@ -18,7 +19,7 @@ export default function DetailOverlay({ visible, onClose, title, children, bgCol
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
           <TouchableOpacity onPress={onClose} style={styles.closeBtn}>
-            <Heroicon name="x" size={24} color="#1a1c1c" />
+            <Heroicon name="x" size={24} color={colors.primary} />
           </TouchableOpacity>
           <Text style={styles.title}>{title}</Text>
           <View style={{ width: 44 }} />
@@ -48,7 +49,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#f5f5f7',
+    backgroundColor: colors.surfaceTint,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -56,6 +57,6 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'ClashDisplay-Bold',
     letterSpacing: 2,
-    color: '#1a1c1c',
+    color: colors.primary,
   },
 });

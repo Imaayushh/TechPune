@@ -1,5 +1,6 @@
 import React, { Component, ReactNode } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { colors } from '../constants/theme';
 
 type Props = { children: ReactNode };
 type State = { hasError: boolean; error?: Error };
@@ -31,9 +32,9 @@ export default class ErrorBoundary extends Component<Props, State> {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: '#fcfcfc' },
-  title: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginBottom: 12 },
-  message: { fontSize: 14, fontFamily: 'Inter-Regular', color: '#666', textAlign: 'center', marginBottom: 24 },
-  button: { backgroundColor: '#1a1c1c', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
-  buttonText: { color: '#fff', fontFamily: 'Inter-Bold', fontSize: 14 },
+  container: { flex: 1, justifyContent: 'center', alignItems: 'center', padding: 24, backgroundColor: colors.background },
+  title: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginBottom: 12 },
+  message: { fontSize: 14, fontFamily: 'Inter-Regular', color: colors.textSubtitle, textAlign: 'center', marginBottom: 24 },
+  button: { backgroundColor: colors.primary, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 12 },
+  buttonText: { color: colors.white, fontFamily: 'Inter-Bold', fontSize: 14 },
 });

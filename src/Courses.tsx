@@ -5,7 +5,6 @@ import {
   Text,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Animated,
   PanResponder,
 } from 'react-native';
@@ -15,15 +14,17 @@ import { Heroicon, type IconName } from './Heroicon';
 import PageHeader from './components/PageHeader';
 import SectionHeader from './components/SectionHeader';
 import { useFadeIn } from './hooks/useFadeIn';
+import { useResponsive } from './hooks/useResponsive';
 import ActionButton from './components/ActionButton';
 import Card from './components/Card';
 import ProgressBar from './components/ProgressBar';
+import { colors } from './constants/theme';
 
-const { width } = Dimensions.get('window');
 
 export default function Courses() {
   const navigation = useNavigation();
   const { fadeAnim, slideAnim } = useFadeIn({ duration: 400, slideFrom: 20 });
+  const { isTablet, sp, fs } = useResponsive();
 
   const panResponder = useRef(
     PanResponder.create({
@@ -69,7 +70,7 @@ export default function Courses() {
             <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.categoryScroll}>
               {categories.map((cat) => (
                 <TouchableOpacity key={cat.name} style={styles.categoryCard}>
-                  <View style={styles.categoryIcon}><Heroicon name={cat.icon} size={20} color="#1a1c1c" /></View>
+                  <View style={styles.categoryIcon}><Heroicon name={cat.icon} size={20} color={colors.primary} /></View>
                   <Text style={styles.categoryName}>{cat.name}</Text>
                   <Text style={styles.categoryCount}>{cat.count} Courses</Text>
                 </TouchableOpacity>
@@ -101,23 +102,23 @@ export default function Courses() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
   scrollContent: { padding: 20 },
-  overviewCard: { backgroundColor: '#1a1c1c', borderRadius: 24, padding: 24, marginBottom: 24 },
-  overviewTitle: { fontSize: 20, color: '#ffffff', fontFamily: 'ClashDisplay-Bold', marginBottom: 20 },
+  overviewCard: { backgroundColor: colors.primary, borderRadius: 24, padding: 24, marginBottom: 24 },
+  overviewTitle: { fontSize: 20, color: colors.white, fontFamily: 'ClashDisplay-Bold', marginBottom: 20 },
   statsRow: { flexDirection: 'row', alignItems: 'center' },
   statItem: { flex: 1 },
-  statValue: { fontSize: 24, color: '#ffffff', fontFamily: 'ClashDisplay-Bold' },
-  statLabel: { fontSize: 12, color: '#9a9a9a', fontFamily: 'Inter-Medium' },
+  statValue: { fontSize: 24, color: colors.white, fontFamily: 'ClashDisplay-Bold' },
+  statLabel: { fontSize: 12, color: colors.textMuted, fontFamily: 'Inter-Medium' },
   statDivider: { width: 2, height: 30, backgroundColor: 'rgba(255,255,255,0.05)', marginHorizontal: 20 },
   categoryScroll: { marginBottom: 24 },
-  categoryCard: { backgroundColor: '#ffffff', borderRadius: 20, padding: 16, width: 130, marginRight: 12 },
-  categoryIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#f5f5f7', justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
-  categoryName: { fontSize: 14, fontFamily: 'Inter-Bold', color: '#1a1c1c', marginBottom: 4 },
-  categoryCount: { fontSize: 11, fontFamily: 'Inter-Medium', color: '#666666' },
+  categoryCard: { backgroundColor: colors.surface, borderRadius: 20, padding: 16, width: 130, marginRight: 12 },
+  categoryIcon: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.surfaceTint, justifyContent: 'center', alignItems: 'center', marginBottom: 12 },
+  categoryName: { fontSize: 14, fontFamily: 'Inter-Bold', color: colors.primary, marginBottom: 4 },
+  categoryCount: { fontSize: 11, fontFamily: 'Inter-Medium', color: colors.textSubtitle },
   courseHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 16 },
   courseInfo: { flex: 1, marginRight: 12 },
-  courseTitle: { fontSize: 16, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginBottom: 4 },
-  courseInstructor: { fontSize: 12, fontFamily: 'Inter-Medium', color: '#666666' },
-  lessonsLeft: { fontSize: 11, fontFamily: 'Inter-Bold', color: '#1a1c1c', backgroundColor: '#f5f5f7', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, height: 24 },
+  courseTitle: { fontSize: 16, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginBottom: 4 },
+  courseInstructor: { fontSize: 12, fontFamily: 'Inter-Medium', color: colors.textSubtitle },
+  lessonsLeft: { fontSize: 11, fontFamily: 'Inter-Bold', color: colors.primary, backgroundColor: colors.surfaceTint, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 6, height: 24 },
 });

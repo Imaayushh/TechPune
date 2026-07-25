@@ -1,5 +1,6 @@
 import { StyleSheet, View, Text } from 'react-native';
 import AnimatedPressable from './AnimatedPressable';
+import { colors } from '../constants/theme';
 
 type SectionHeaderProps = {
   title: string;
@@ -29,12 +30,12 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 24,
-    color: '#1a1c1c',
+    color: colors.primary,
     fontFamily: 'CabinetGrotesk-Bold',
   },
   viewAll: {
     fontSize: 14,
-    color: '#1a1c1c',
+    color: colors.primary,
     textDecorationLine: 'underline',
     fontFamily: 'Inter-Medium',
   },

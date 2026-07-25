@@ -19,6 +19,8 @@ import { useAppContext } from './context/AppContext';
 import AnimatedPressable from './components/AnimatedPressable';
 import { useFadeIn } from './hooks/useFadeIn';
 import PageHeader from './components/PageHeader';
+import { colors } from './constants/theme';
+import { saveProfile } from './services/api';
 
 type PersonalInfo = {
   fullName: string;
@@ -77,25 +79,30 @@ export default function ProfilePage() {
     return true;
   };
 
-  const handleEditPress = () => {
+  const handleEditPress = async () => {
     if (!isEditing) {
       setOriginalInfo({ ...personalInfo });
       setIsEditing(true);
     } else {
       if (validate()) {
         setIsSaving(true);
-        setTimeout(() => {
-          updateUser({
-            fullName: personalInfo.fullName,
-            mobile: personalInfo.mobile,
-            address: personalInfo.address,
-            dob: personalInfo.dob,
-            college: personalInfo.college,
-          });
-          setIsSaving(false);
-          setIsEditing(false);
-          Alert.alert('Profile Updated', 'Your changes have been saved successfully.');
-        }, 1500);
+        await saveProfile({
+          fullName: personalInfo.fullName,
+          mobile: personalInfo.mobile,
+          address: personalInfo.address,
+          dob: personalInfo.dob,
+          college: personalInfo.college,
+        });
+        updateUser({
+          fullName: personalInfo.fullName,
+          mobile: personalInfo.mobile,
+          address: personalInfo.address,
+          dob: personalInfo.dob,
+          college: personalInfo.college,
+        });
+        setIsSaving(false);
+        setIsEditing(false);
+        Alert.alert('Profile Updated', 'Your changes have been saved successfully.');
       }
     }
   };
@@ -115,28 +122,33 @@ export default function ProfilePage() {
     ]);
   };
 
-  const saveAndGoBack = () => {
+  const saveAndGoBack = async () => {
     if (!validate()) return;
     setIsSaving(true);
-    setTimeout(() => {
-      updateUser({
-        fullName: personalInfo.fullName,
-        mobile: personalInfo.mobile,
-        address: personalInfo.address,
-        dob: personalInfo.dob,
-        college: personalInfo.college,
-      });
-      setIsSaving(false);
-      setIsEditing(false);
-      navigation.goBack();
-    }, isEditing ? 1000 : 0);
+    await saveProfile({
+      fullName: personalInfo.fullName,
+      mobile: personalInfo.mobile,
+      address: personalInfo.address,
+      dob: personalInfo.dob,
+      college: personalInfo.college,
+    });
+    updateUser({
+      fullName: personalInfo.fullName,
+      mobile: personalInfo.mobile,
+      address: personalInfo.address,
+      dob: personalInfo.dob,
+      college: personalInfo.college,
+    });
+    setIsSaving(false);
+    setIsEditing(false);
+    navigation.goBack();
   };
 
   const renderDetailRow = (icon: IconName, label: string, value: string, key: string, isLast = false) => (
     <View key={key}>
       <View style={styles.detailRow}>
         <View style={styles.detailIconContainer}>
-          <Heroicon name={icon} size={20} color="#1a1c1c" />
+          <Heroicon name={icon} size={20} color={colors.primary} />
         </View>
         <View style={styles.detailContent}>
           <Text style={styles.detailLabelText}>{label}</Text>
@@ -150,7 +162,7 @@ export default function ProfilePage() {
                 style={styles.detailInput}
                 value={value}
                 onChangeText={(text) => setPersonalInfo({ ...personalInfo, [key]: text })}
-                placeholderTextColor="#9a9a9a"
+                placeholderTextColor={colors.textMuted}
               />
             )
           ) : (
@@ -194,12 +206,12 @@ export default function ProfilePage() {
               <View style={styles.headerActions}>
                 {isEditing && (
                   <AnimatedPressable onPress={handleCancel} style={[styles.editToggleBtn, { marginRight: 8, backgroundColor: '#fff0f0' }]}>
-                    <Text style={[styles.editToggleText, { color: '#ff4b4b' }]}>Cancel</Text>
+                    <Text style={[styles.editToggleText, { color: colors.danger }]}>Cancel</Text>
                   </AnimatedPressable>
                 )}
                 <AnimatedPressable onPress={handleEditPress} style={styles.editToggleBtn} disabled={isSaving}>
                   {isSaving ? (
-                    <ActivityIndicator size="small" color="#1a1c1c" />
+                    <ActivityIndicator size="small" color={colors.primary} />
                   ) : (
                     <Text style={[styles.editToggleText, isEditing && styles.saveToggleText]}>
                       {isEditing ? 'Save' : 'Edit'}
@@ -302,48 +314,48 @@ export default function ProfilePage() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
   scrollBody: { paddingBottom: 40 },
   avatarSection: { alignItems: 'center', paddingTop: 32, paddingBottom: 24 },
-  avatarWrapper: { shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 15, elevation: 10, marginBottom: 16 },
+  avatarWrapper: { shadowColor: colors.black, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.1, shadowRadius: 15, elevation: 10, marginBottom: 16 },
   avatarContainer: { position: 'relative', width: 110, height: 110 },
-  avatarImageBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: '#1a1c1c', justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: '#ffffff', overflow: 'hidden' },
-  avatarPlaceholder: { fontSize: 44, fontFamily: 'ClashDisplay-Bold', color: '#ffffff' },
-  cameraOverlay: { position: 'absolute', bottom: 2, right: 2, backgroundColor: '#1a1c1c', width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: '#ffffff', justifyContent: 'center', alignItems: 'center', elevation: 4 },
+  avatarImageBg: { width: 110, height: 110, borderRadius: 55, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center', borderWidth: 3, borderColor: colors.white, overflow: 'hidden' },
+  avatarPlaceholder: { fontSize: 44, fontFamily: 'ClashDisplay-Bold', color: colors.white },
+  cameraOverlay: { position: 'absolute', bottom: 2, right: 2, backgroundColor: colors.primary, width: 32, height: 32, borderRadius: 16, borderWidth: 2, borderColor: colors.white, justifyContent: 'center', alignItems: 'center', elevation: 4 },
   userInfoTop: { alignItems: 'center', marginBottom: 24 },
-  userNameText: { fontSize: 28, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c' },
-  userEmailText: { fontSize: 14, fontFamily: 'Inter-Medium', color: '#666666', marginTop: 4 },
+  userNameText: { fontSize: 28, fontFamily: 'ClashDisplay-Bold', color: colors.primary },
+  userEmailText: { fontSize: 14, fontFamily: 'Inter-Medium', color: colors.textSubtitle, marginTop: 4 },
   sectionWrapper: { paddingHorizontal: 20, marginBottom: 24 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 },
-  sectionTitle: { fontSize: 16, fontFamily: 'CabinetGrotesk-Bold', color: '#1a1c1c' },
+  sectionTitle: { fontSize: 16, fontFamily: 'CabinetGrotesk-Bold', color: colors.primary },
   headerActions: { flexDirection: 'row', alignItems: 'center' },
-  sectionSubtitle: { fontSize: 11, fontFamily: 'Inter-Medium', color: '#666666', marginTop: 2 },
-  editToggleBtn: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 10, backgroundColor: '#f5f5f7' },
-  editToggleText: { fontSize: 13, fontFamily: 'Inter-Bold', color: '#1a1c1c' },
-  saveToggleText: { color: '#00c853' },
-  detailsCard: { backgroundColor: '#ffffff', borderRadius: 24, paddingVertical: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 4 },
+  sectionSubtitle: { fontSize: 11, fontFamily: 'Inter-Medium', color: colors.textSubtitle, marginTop: 2 },
+  editToggleBtn: { paddingVertical: 6, paddingHorizontal: 12, borderRadius: 10, backgroundColor: colors.surfaceTint },
+  editToggleText: { fontSize: 13, fontFamily: 'Inter-Bold', color: colors.primary },
+  saveToggleText: { color: colors.success },
+  detailsCard: { backgroundColor: colors.surface, borderRadius: 24, paddingVertical: 8, shadowColor: colors.black, shadowOffset: { width: 0, height: 8 }, shadowOpacity: 0.04, shadowRadius: 16, elevation: 4 },
   detailRow: { flexDirection: 'row', alignItems: 'center', paddingVertical: 14, paddingHorizontal: 16 },
-  detailIconContainer: { width: 40, height: 40, borderRadius: 12, backgroundColor: '#f5f5f7', justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  detailIconContainer: { width: 40, height: 40, borderRadius: 12, backgroundColor: colors.surfaceTint, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   detailContent: { flex: 1 },
-  detailLabelText: { fontSize: 10, fontFamily: 'Inter-Medium', color: '#666666', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 1 },
-  detailValueText: { fontSize: 14, fontFamily: 'Inter-Bold', color: '#1a1c1c' },
-  detailInput: { fontSize: 14, fontFamily: 'Inter-Bold', color: '#1a1c1c', paddingVertical: 0 },
-  detailDivider: { height: 1, backgroundColor: '#f5f5f7', marginHorizontal: 16 },
+  detailLabelText: { fontSize: 10, fontFamily: 'Inter-Medium', color: colors.textSubtitle, textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 1 },
+  detailValueText: { fontSize: 14, fontFamily: 'Inter-Bold', color: colors.primary },
+  detailInput: { fontSize: 14, fontFamily: 'Inter-Bold', color: colors.primary, paddingVertical: 0 },
+  detailDivider: { height: 1, backgroundColor: colors.divider, marginHorizontal: 16 },
   modalBackdrop: { flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0,0,0,0.4)' },
-  bottomSheet: { backgroundColor: '#ffffff', borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 12, paddingHorizontal: 24, paddingBottom: 50 },
-  sheetHandle: { width: 40, height: 4, backgroundColor: '#e2e2e2', borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
-  sheetTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginBottom: 20, textAlign: 'center' },
-  calendarContainer: { flexDirection: 'row', height: 280, marginBottom: 20, backgroundColor: '#f8f8fa', borderRadius: 20, padding: 10 },
+  bottomSheet: { backgroundColor: colors.surface, borderTopLeftRadius: 32, borderTopRightRadius: 32, paddingTop: 12, paddingHorizontal: 24, paddingBottom: 50 },
+  sheetHandle: { width: 40, height: 4, backgroundColor: colors.calendarHandle, borderRadius: 2, alignSelf: 'center', marginBottom: 20 },
+  sheetTitle: { fontSize: 20, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginBottom: 20, textAlign: 'center' },
+  calendarContainer: { flexDirection: 'row', height: 280, marginBottom: 20, backgroundColor: colors.calendarBg, borderRadius: 20, padding: 10 },
   calendarColumn: { flex: 1, alignItems: 'center' },
-  calendarColumnLabel: { fontSize: 10, fontFamily: 'Inter-Bold', color: '#666666', textTransform: 'uppercase', marginBottom: 8, letterSpacing: 1 },
+  calendarColumnLabel: { fontSize: 10, fontFamily: 'Inter-Bold', color: colors.textSubtitle, textTransform: 'uppercase', marginBottom: 8, letterSpacing: 1 },
   calendarItem: { paddingVertical: 12, paddingHorizontal: 10, width: '100%', alignItems: 'center' },
-  calendarItemText: { fontSize: 16, fontFamily: 'Inter-Medium', color: '#1a1c1c', opacity: 0.5 },
-  calendarItemTextSelected: { fontSize: 18, fontFamily: 'Inter-Bold', color: '#1a1c1c', opacity: 1 },
-  confirmBtn: { paddingVertical: 16, backgroundColor: '#1a1c1c', borderRadius: 16, alignItems: 'center', shadowColor: '#1a1c1c', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4, zIndex: 10 },
-  confirmBtnText: { fontSize: 16, fontFamily: 'Inter-Bold', color: '#ffffff' },
-  continueContainer: { padding: 20, backgroundColor: '#fcfcfc' },
-  continueButton: { height: 58, borderRadius: 999, backgroundColor: '#1a1c1c', justifyContent: 'center', alignItems: 'center' },
+  calendarItemText: { fontSize: 16, fontFamily: 'Inter-Medium', color: colors.primary, opacity: 0.5 },
+  calendarItemTextSelected: { fontSize: 18, fontFamily: 'Inter-Bold', color: colors.primary, opacity: 1 },
+  confirmBtn: { paddingVertical: 16, backgroundColor: colors.primary, borderRadius: 16, alignItems: 'center', shadowColor: colors.primary, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.2, shadowRadius: 8, elevation: 4, zIndex: 10 },
+  confirmBtnText: { fontSize: 16, fontFamily: 'Inter-Bold', color: colors.white },
+  continueContainer: { padding: 20, backgroundColor: colors.background },
+  continueButton: { height: 58, borderRadius: 999, backgroundColor: colors.primary, justifyContent: 'center', alignItems: 'center' },
   continueButtonDisabled: { opacity: 0.5 },
-  continueButtonText: { color: '#ffffff', fontSize: 16, fontFamily: 'Inter-Semibold' },
+  continueButtonText: { color: colors.white, fontSize: 16, fontFamily: 'Inter-Semibold' },
 });
 

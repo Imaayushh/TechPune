@@ -35,7 +35,7 @@ function AppContent() {
       <NavigationContainer>
         <StatusBar style="auto" />
         <Stack.Navigator
-          initialRouteName="Login"
+          initialRouteName="MainTabs"
           screenOptions={{ headerShown: false, animation: 'slide_from_right' }}
         >
           <Stack.Screen name="Login" component={LoginPage} />

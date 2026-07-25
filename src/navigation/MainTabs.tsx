@@ -6,6 +6,8 @@ import Hackathons from '../Hackathons';
 import News from '../News';
 import Courses from '../Courses';
 import { Heroicon, type IconName } from '../Heroicon';
+import { triggerNewsRefresh } from '../services/newsRefreshEmitter';
+import { colors } from '../constants/theme';
 
 type TabConfig = {
   name: string;
@@ -45,6 +47,7 @@ export default function MainTabs() {
               </View>
             ),
           }}
+          {...(tab.name === 'News' ? { listeners: { tabPress: () => triggerNewsRefresh() } } : {})}
         />
       ))}
     </Tab.Navigator>
@@ -53,18 +56,18 @@ export default function MainTabs() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    backgroundColor: '#fcfcfc',
+    backgroundColor: colors.background,
     borderTopWidth: 1,
     borderTopColor: '#e8e8e8',
     height: 72,
     paddingBottom: 8,
     paddingTop: 8,
     elevation: 8,
-    shadowColor: '#000',
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: -2 },
     shadowOpacity: 0.06,
     shadowRadius: 8,
   },
   iconContainer: { width: 36, height: 36, borderRadius: 8, justifyContent: 'center', alignItems: 'center' },
-  iconContainerActive: { backgroundColor: '#1a1c1c' },
+  iconContainerActive: { backgroundColor: colors.primary },
 });

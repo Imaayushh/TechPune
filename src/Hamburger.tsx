@@ -17,6 +17,7 @@ import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Heroicon, type IconName } from './Heroicon';
 import { useAppContext } from './context/AppContext';
+import { colors } from './constants/theme';
 import type { RootStackParamList } from './types';
 
 const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get('window');
@@ -241,7 +242,7 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    backgroundColor: colors.overlay,
   },
   drawer: {
     position: 'absolute',
@@ -249,9 +250,8 @@ const styles = StyleSheet.create({
     top: 0,
     bottom: 0,
     width: DRAWER_WIDTH,
-    backgroundColor: '#1a1c1c',
-    shadowColor: '#000',
-    shadowOffset: { width: 10, height: 0 },
+    backgroundColor: colors.primary,
+    shadowColor: colors.black,
     shadowOpacity: 0.4,
     shadowRadius: 20,
     elevation: 20,
@@ -270,7 +270,7 @@ const styles = StyleSheet.create({
     width: 50,
     height: 50,
     borderRadius: 25,
-    backgroundColor: '#ffffff',
+    backgroundColor: colors.white,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -278,7 +278,7 @@ const styles = StyleSheet.create({
   avatarLetter: {
     fontSize: 20,
     fontFamily: 'ClashDisplay-Bold',
-    color: '#1a1c1c',
+    color: colors.primary,
   },
   headerText: {
     flex: 1,
@@ -286,13 +286,13 @@ const styles = StyleSheet.create({
   userName: {
     fontSize: 18,
     fontFamily: 'ClashDisplay-Bold',
-    color: '#ffffff',
+    color: colors.white,
     marginBottom: 2,
   },
   userEmail: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#9a9a9a',
+    color: colors.textMuted,
   },
   divider: {
     height: 1,

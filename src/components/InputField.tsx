@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, Text, TextInput, StyleSheet } from 'react-native';
+import { colors } from '../constants/theme';
 
 type InputFieldProps = {
   label: string;
@@ -21,7 +22,7 @@ export default function InputField({
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
-        placeholderTextColor="#9a9a9a"
+        placeholderTextColor={colors.textMuted}
         multiline={multiline}
         textAlignVertical={multiline ? 'top' : 'center'}
       />
@@ -32,11 +33,11 @@ export default function InputField({
 const styles = StyleSheet.create({
   inputContainer: { width: '100%' },
   label: {
-    fontSize: 10, fontFamily: 'Inter-Bold', color: '#666666',
+    fontSize: 10, fontFamily: 'Inter-Bold', color: colors.textSubtitle,
     letterSpacing: 1, marginBottom: 8, marginLeft: 4,
   },
   input: {
-    backgroundColor: '#fcfcfc', borderRadius: 16, paddingHorizontal: 16,
-    fontSize: 15, fontFamily: 'Inter-Medium', color: '#1a1c1c',
+    backgroundColor: colors.background, borderRadius: 16, paddingHorizontal: 16,
+    fontSize: 15, fontFamily: 'Inter-Medium', color: colors.primary,
   },
 });

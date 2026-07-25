@@ -4,6 +4,7 @@ import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Heroicon } from '../Heroicon';
 import { useAppContext } from '../context/AppContext';
 import AnimatedPressable from './AnimatedPressable';
+import { colors } from '../constants/theme';
 import type { RootStackParamList } from '../types';
 
 type PageHeaderProps = {
@@ -16,7 +17,7 @@ type PageHeaderProps = {
 export default function PageHeader({ title, showProfile = true, showBack, dark }: PageHeaderProps) {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { setMenuVisible } = useAppContext();
-  const color = dark ? '#ffffff' : '#1a1c1c';
+  const color = dark ? colors.white : colors.primary;
 
   return (
     <View style={[styles.header, dark && styles.darkHeader]}>
@@ -61,7 +62,7 @@ const styles = StyleSheet.create({
     width: 44,
     height: 44,
     borderRadius: 22,
-    backgroundColor: '#f5f5f7',
+    backgroundColor: colors.surfaceTint,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -75,11 +76,11 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'ClashDisplay-Bold',
     letterSpacing: 2,
-    color: '#1a1c1c',
+    color: colors.primary,
   },
   darkTitle: {
     fontSize: 18,
     letterSpacing: 0,
-    color: '#ffffff',
+    color: colors.white,
   },
 });

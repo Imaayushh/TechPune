@@ -1,4 +1,5 @@
 import { StyleSheet, View, Text } from 'react-native';
+import { colors } from '../constants/theme';
 
 type ProgressBarProps = {
   percent: number;
@@ -30,12 +31,12 @@ const styles = StyleSheet.create({
   },
   fill: {
     height: '100%',
-    backgroundColor: '#1a1c1c',
+    backgroundColor: colors.primary,
     borderRadius: 3,
   },
   label: {
     fontSize: 12,
     fontFamily: 'Inter-Medium',
-    color: '#474747',
+    color: colors.textBody,
   },
 });

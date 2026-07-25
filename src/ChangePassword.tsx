@@ -18,6 +18,8 @@ import { LinearGradient } from 'expo-linear-gradient';
 import AnimatedPressable from './components/AnimatedPressable';
 import { useFadeIn } from './hooks/useFadeIn';
 import PageHeader from './components/PageHeader';
+import { colors } from './constants/theme';
+import { changePassword } from './services/api';
 
 export default function ChangePassword() {
   const navigation = useNavigation();
@@ -38,12 +40,12 @@ export default function ChangePassword() {
     if (/[A-Z]/.test(pw)) score++;
     if (/\d/.test(pw)) score++;
     if (/[^a-zA-Z0-9]/.test(pw)) score++;
-    if (score <= 2) return { label: 'Weak', color: '#ff4b4b', score };
-    if (score <= 3) return { label: 'Medium', color: '#ffa500', score };
-    return { label: 'Strong', color: '#00c853', score };
+    if (score <= 2) return { label: 'Weak', color: colors.danger, score };
+    if (score <= 3) return { label: 'Medium', color: colors.warning, score };
+    return { label: 'Strong', color: colors.success, score };
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!currentPw || !newPw || !confirmPw) {
       Alert.alert('Error', 'Please fill in all fields.'); return;
     }
@@ -58,12 +60,11 @@ export default function ChangePassword() {
     }
 
     setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
-      Alert.alert('Success', 'Your password has been updated successfully.', [
-        { text: 'OK', onPress: () => navigation.goBack() },
-      ]);
-    }, 2000);
+    await changePassword(currentPw, newPw);
+    setIsLoading(false);
+    Alert.alert('Success', 'Your password has been updated successfully.', [
+      { text: 'OK', onPress: () => navigation.goBack() },
+    ]);
   };
 
   const PasswordInput = ({
@@ -97,7 +98,7 @@ export default function ChangePassword() {
       <ScrollView contentContainerStyle={styles.content} showsVerticalScrollIndicator={false}>
         <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <View style={styles.infoCard}>
-            <Heroicon name="shield-lock" size={24} color="#1a1c1c" />
+            <Heroicon name="shield-lock" size={24} color={colors.primary} />
             <Text style={styles.infoText}>
               Strong passwords include a mix of letters, numbers, and symbols.
             </Text>
@@ -111,10 +112,10 @@ export default function ChangePassword() {
             <PasswordInput label="Confirm New Password" value={confirmPw} onChangeText={setConfirmPw} show={showConfirm} setShow={setShowConfirm} />
           </View>
 
-          <AnimatedPressable style={[styles.updateBtn, { opacity: isLoading ? 0.7 : 1 }]} onPress={handleUpdate} disabled={isLoading}>
-            <LinearGradient colors={isLoading ? ['#333333', '#333333'] : ['#1a1c1c', '#333333']} style={styles.btnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+          <AnimatedPressable onPress={handleUpdate} disabled={isLoading} style={styles.updateBtn}>
+            <LinearGradient colors={isLoading ? [colors.gradientEnd, colors.gradientEnd] : [colors.primary, colors.gradientEnd]} style={styles.btnGradient} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
               {isLoading ? (
-                <ActivityIndicator color="#ffffff" size="small" />
+                <ActivityIndicator color={colors.white} size="small" />
               ) : (
                 <Text style={styles.updateText}>Update Password</Text>
               )}
@@ -127,19 +128,19 @@ export default function ChangePassword() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
   content: { padding: 20 },
-  infoCard: { flexDirection: 'row', backgroundColor: '#ffffff', padding: 20, borderRadius: 20, alignItems: 'center', marginBottom: 32, gap: 16 },
-  infoText: { flex: 1, fontSize: 13, fontFamily: 'Inter-Medium', color: '#666666', lineHeight: 18 },
-  formCard: { backgroundColor: '#ffffff', borderRadius: 20, padding: 20, marginBottom: 40 },
+  infoCard: { flexDirection: 'row', backgroundColor: colors.surface, padding: 20, borderRadius: 20, alignItems: 'center', marginBottom: 32, gap: 16 },
+  infoText: { flex: 1, fontSize: 13, fontFamily: 'Inter-Medium', color: colors.textSubtitle, lineHeight: 18 },
+  formCard: { backgroundColor: colors.surface, borderRadius: 20, padding: 20, marginBottom: 40 },
   inputGroup: { paddingVertical: 12 },
-  inputLabel: { fontSize: 10, fontFamily: 'Inter-Bold', color: '#9a9a9a', letterSpacing: 1.5, marginBottom: 12, textTransform: 'uppercase' },
-  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#f5f5f7', borderRadius: 16, paddingHorizontal: 16, height: 56 },
-  input: { flex: 1, marginLeft: 12, fontSize: 15, fontFamily: 'Inter-Semibold', color: '#1a1c1c' },
+  inputLabel: { fontSize: 10, fontFamily: 'Inter-Bold', color: colors.textMuted, letterSpacing: 1.5, marginBottom: 12, textTransform: 'uppercase' },
+  inputWrapper: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.inputBg, borderRadius: 16, paddingHorizontal: 16, height: 56 },
+  input: { flex: 1, marginLeft: 12, fontSize: 15, fontFamily: 'Inter-Semibold', color: colors.primary },
   eyeBtn: { padding: 8 },
-  divider: { height: 1, backgroundColor: '#f0f0f0', marginVertical: 4 },
+  divider: { height: 1, backgroundColor: colors.divider, marginVertical: 4 },
   updateBtn: { height: 60, borderRadius: 20, overflow: 'hidden' },
   btnGradient: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  updateText: { fontSize: 16, fontFamily: 'Inter-Bold', color: '#ffffff' },
+  updateText: { fontSize: 16, fontFamily: 'Inter-Bold', color: colors.white },
 });
 

@@ -17,6 +17,8 @@ import { Heroicon } from './Heroicon';
 import InputField from './components/InputField';
 import PageHeader from './components/PageHeader';
 import { useFadeIn } from './hooks/useFadeIn';
+import { colors } from './constants/theme';
+import { submitCourse } from './services/api';
 
 export default function UploadCourse() {
   const navigation = useNavigation();
@@ -26,7 +28,7 @@ export default function UploadCourse() {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!formData.title.trim()) {
       Alert.alert('Missing Info', 'Please enter the course title.'); return;
     }
@@ -37,11 +39,10 @@ export default function UploadCourse() {
       Alert.alert('Missing Info', 'Please enter the course description.'); return;
     }
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
-      Alert.alert('Success', 'Course details have been submitted for review.');
-      navigation.goBack();
-    }, 1500);
+    await submitCourse(formData);
+    setIsSubmitting(false);
+    Alert.alert('Success', 'Course details have been submitted for review.');
+    navigation.goBack();
   };
 
   return (
@@ -52,7 +53,7 @@ export default function UploadCourse() {
         <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
           <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: slideAnim }] }}>
           <View style={styles.infoCard}>
-            <Heroicon name="book-open" size={32} color="#1a1c1c" />
+            <Heroicon name="book-open" size={32} color={colors.primary} />
             <Text style={styles.infoTitle}>Course Curriculum</Text>
             <Text style={styles.infoSubtitle}>Share your knowledge with the community by creating a structured learning path.</Text>
           </View>
@@ -89,13 +90,13 @@ export default function UploadCourse() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#ffffff' },
+  container: { flex: 1, backgroundColor: colors.surface },
   scrollContent: { padding: 24 },
   infoCard: { marginBottom: 32 },
-  infoTitle: { fontSize: 28, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginTop: 16, marginBottom: 8 },
-  infoSubtitle: { fontSize: 15, fontFamily: 'Inter-Regular', color: '#666666', lineHeight: 22 },
+  infoTitle: { fontSize: 28, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginTop: 16, marginBottom: 8 },
+  infoSubtitle: { fontSize: 15, fontFamily: 'Inter-Regular', color: colors.textSubtitle, lineHeight: 22 },
   formSection: { gap: 20, marginBottom: 32 },
   row: { flexDirection: 'row', alignItems: 'center' },
-  submitBtn: { backgroundColor: '#1a1c1c', height: 60, borderRadius: 16, justifyContent: 'center', alignItems: 'center', shadowColor: '#000', shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
-  submitBtnText: { color: '#ffffff', fontSize: 16, fontFamily: 'Inter-Bold' },
+  submitBtn: { backgroundColor: colors.primary, height: 60, borderRadius: 16, justifyContent: 'center', alignItems: 'center', shadowColor: colors.black, shadowOffset: { width: 0, height: 4 }, shadowOpacity: 0.1, shadowRadius: 12, elevation: 4 },
+  submitBtnText: { color: colors.white, fontSize: 16, fontFamily: 'Inter-Bold' },
 });

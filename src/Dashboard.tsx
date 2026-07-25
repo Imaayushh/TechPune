@@ -1,11 +1,10 @@
-﻿import React, { useEffect, useRef, useState } from 'react';
+﻿import React, { useState } from 'react';
 import {
   StyleSheet,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
-  Dimensions,
   Animated,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -20,15 +19,16 @@ import SectionHeader from './components/SectionHeader';
 import Badge from './components/Badge';
 import ProgressBar from './components/ProgressBar';
 import { useFadeIn } from './hooks/useFadeIn';
+import { useResponsive } from './hooks/useResponsive';
+import { colors } from './constants/theme';
 import type { RootStackParamList } from './types';
-
-const { width } = Dimensions.get('window');
 
 export default function Dashboard() {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { user } = useAppContext();
   const [showPrompt, setShowPrompt] = useState(!user.isProfileComplete);
   const { fadeAnim, slideAnim } = useFadeIn({ duration: 400, slideFrom: 20 });
+  const { width, sp, fs, isTablet, isLandscape } = useResponsive();
 
   const renderCard = (children: any, style: any = {}) => (
     <Animated.View style={[style, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
@@ -45,14 +45,14 @@ export default function Dashboard() {
         {showPrompt && !user.isProfileComplete && (
           <Animated.View style={[styles.promptContainer, { opacity: fadeAnim, transform: [{ translateY: slideAnim }] }]}>
             <LinearGradient
-              colors={['#1a1c1c', '#333333']}
+              colors={[colors.gradientStart, colors.gradientEnd]}
               style={styles.promptGradient}
               start={{ x: 0, y: 0 }}
               end={{ x: 1, y: 1 }}
             >
               <View style={styles.promptContent}>
                 <View style={styles.promptIconCircle}>
-                  <Heroicon name="user" size={20} color="#1a1c1c" />
+                  <Heroicon name="user" size={20} color={colors.primary} />
                 </View>
                 <View style={styles.promptTextContainer}>
                   <Text style={styles.promptText}>
@@ -96,12 +96,12 @@ export default function Dashboard() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
             decelerationRate="fast"
-            snapToInterval={width - 40 + 16}
+            snapToInterval={width - sp(40) + sp(16)}
             snapToAlignment="start"
             disableIntervalMomentum={true}
           >
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#f5f5f7' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#f5f5f7' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="HACKATHON" />
                   <Text style={styles.timeLeft}>Ends in 3 Days</Text>
@@ -112,26 +112,26 @@ export default function Dashboard() {
                 </Text>
                 <View style={styles.cardFooter}>
                   <View style={styles.avatars}>
-                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                    <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
                       <Text style={styles.avatarInitial}>JD</Text>
                     </View>
                     <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
                       <Text style={styles.avatarInitial}>AS</Text>
                     </View>
                     <View style={[styles.avatar, { backgroundColor: '#e2e2e2', marginLeft: -10 }]}>
-                      <Text style={[styles.avatarInitial, { color: '#1a1c1c' }]}>+2</Text>
+                      <Text style={[styles.avatarInitial, { color: colors.primary }]}>+2</Text>
                     </View>
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Hackathons')} style={{ width: '100%', marginTop: 16 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
               </View>
             )}
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#eeeeee' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#eeeeee' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="HACKATHON" />
                   <Text style={styles.timeLeft}>Starts Tomorrow</Text>
@@ -151,14 +151,14 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Hackathons')} style={{ width: '100%', marginTop: 16 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
               </View>
             )}
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#e2e2e2' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#e2e2e2' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="HACKATHON" />
                   <Text style={styles.timeLeft}>Ends in 5 Days</Text>
@@ -169,7 +169,7 @@ export default function Dashboard() {
                 </Text>
                 <View style={styles.cardFooter}>
                   <View style={styles.avatars}>
-                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                    <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
                       <Text style={styles.avatarInitial}>RN</Text>
                     </View>
                     <View style={[styles.avatar, { backgroundColor: '#5f5e5e', marginLeft: -10 }]}>
@@ -178,14 +178,14 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Hackathons')} style={{ width: '100%', marginTop: 16 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
               </View>
             )}
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#d6d4d3' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#d6d4d3' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="HACKATHON" />
                   <Text style={styles.timeLeft}>Ends in 1 Week</Text>
@@ -202,7 +202,7 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Hackathons')} style={{ width: '100%', marginTop: 16 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
@@ -219,12 +219,12 @@ export default function Dashboard() {
             showsHorizontalScrollIndicator={false}
             contentContainerStyle={styles.horizontalScroll}
             decelerationRate="fast"
-            snapToInterval={width - 40 + 16}
+            snapToInterval={width - sp(40) + sp(16)}
             snapToAlignment="start"
             disableIntervalMomentum={true}
           >
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#f5f5f7' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#f5f5f7' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="COURSE" />
                 </View>
@@ -232,7 +232,7 @@ export default function Dashboard() {
                   <ProgressBar percent={65} showLabel />
                 <View style={styles.cardFooter}>
                   <View style={styles.avatars}>
-                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                    <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
                       <Text style={styles.avatarInitial}>JD</Text>
                     </View>
                     <View style={[styles.avatar, { backgroundColor: '#3b3b3b', marginLeft: -10 }]}>
@@ -241,14 +241,14 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Courses')} style={{ width: '100%', marginTop: 12 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
               </View>
             )}
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#eeeeee' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#eeeeee' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="COURSE" />
                 </View>
@@ -265,14 +265,14 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Courses')} style={{ width: '100%', marginTop: 12 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
               </View>
             )}
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#e2e2e2' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#e2e2e2' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="COURSE" />
                 </View>
@@ -280,7 +280,7 @@ export default function Dashboard() {
                   <ProgressBar percent={15} showLabel />
                 <View style={styles.cardFooter}>
                   <View style={styles.avatars}>
-                    <View style={[styles.avatar, { backgroundColor: '#1a1c1c' }]}>
+                    <View style={[styles.avatar, { backgroundColor: colors.primary }]}>
                       <Text style={styles.avatarInitial}>RN</Text>
                     </View>
                     <View style={[styles.avatar, { backgroundColor: '#5f5e5e', marginLeft: -10 }]}>
@@ -289,14 +289,14 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Courses')} style={{ width: '100%', marginTop: 12 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
               </View>
             )}
             {renderCard(
-              <View style={[styles.activeCard, styles.horizontalCard, { backgroundColor: '#d6d4d3' }]}>
+              <View style={[styles.activeCard, styles.horizontalCard, { width: width - sp(40), backgroundColor: '#d6d4d3' }]}>
                 <View style={styles.cardHeader}>
                   <Badge label="COURSE" />
                 </View>
@@ -310,7 +310,7 @@ export default function Dashboard() {
                   </View>
                 </View>
                 <AnimatedPressable activeOpacity={0.85} onPress={() => navigation.navigate('Courses')} style={{ width: '100%', marginTop: 12 }}>
-                  <LinearGradient colors={['#1a1c1c', '#4a4c4c']} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
+                  <LinearGradient colors={[colors.primary, colors.gradientMid]} style={styles.resumeButton} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }}>
                     <Text style={styles.resumeButtonText}>View Details  â†’</Text>
                   </LinearGradient>
                 </AnimatedPressable>
@@ -366,51 +366,47 @@ export default function Dashboard() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
 
   scrollContent: { paddingHorizontal: 20, paddingTop: 18 },
   heroSection: { marginBottom: 26 },
-  welcomeText: { fontSize: 42, color: '#1a1c1c', fontFamily: 'ClashDisplay-Bold', lineHeight: 46 },
-  userNameHero: { fontSize: 34, color: '#1a1c1c', lineHeight: 38, marginBottom: 14, fontFamily: 'ClashDisplay-Bold' },
-  heroDescription: { fontSize: 16, color: '#474747', lineHeight: 24, fontFamily: 'Inter-Regular' },
+  welcomeText: { fontSize: 42, color: colors.primary, fontFamily: 'ClashDisplay-Bold', lineHeight: 46 },
+  userNameHero: { fontSize: 34, color: colors.primary, lineHeight: 38, marginBottom: 14, fontFamily: 'ClashDisplay-Bold' },
+  heroDescription: { fontSize: 16, color: colors.textBody, lineHeight: 24, fontFamily: 'Inter-Regular' },
   section: { marginBottom: 28 },
-  activeCard: { backgroundColor: '#ffffff', borderRadius: 20, padding: 24, marginBottom: 20 },
+  activeCard: { backgroundColor: colors.surface, borderRadius: 20, padding: 24, marginBottom: 20 },
   horizontalScroll: { paddingRight: 20 },
-  horizontalCard: { width: width - 40, marginRight: 16, marginBottom: 0 },
+  horizontalCard: { marginRight: 16, marginBottom: 0 },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 20 },
-  timeLeft: { fontSize: 12, color: '#5f5e5e', fontFamily: 'Inter-Regular' },
-  cardMainTitle: { fontSize: 28, color: '#1a1c1c', marginBottom: 12, fontFamily: 'ClashDisplay-Bold', lineHeight: 30 },
-  cardDescription: { fontSize: 14, color: '#474747', lineHeight: 20, marginBottom: 20, fontFamily: 'Inter-Regular' },
+  timeLeft: { fontSize: 12, color: colors.textLight, fontFamily: 'Inter-Regular' },
+  cardMainTitle: { fontSize: 28, color: colors.primary, marginBottom: 12, fontFamily: 'ClashDisplay-Bold', lineHeight: 30 },
+  cardDescription: { fontSize: 14, color: colors.textBody, lineHeight: 20, marginBottom: 20, fontFamily: 'Inter-Regular' },
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12 },
   avatars: { flexDirection: 'row', alignItems: 'center' },
   avatar: { width: 32, height: 32, borderRadius: 16, justifyContent: 'center', alignItems: 'center' },
-  avatarInitial: { fontSize: 10, color: '#ffffff', fontFamily: 'Inter-Semibold' },
-  progressContainer: { marginBottom: 20 },
-  progressBar: { height: 6, backgroundColor: '#e2e2e2', borderRadius: 3, marginBottom: 8 },
-  progressFill: { height: '100%', backgroundColor: '#1a1c1c', borderRadius: 3 },
-  progressText: { fontSize: 12, color: '#5f5e5e', textAlign: 'right', fontFamily: 'Inter-Regular' },
+  avatarInitial: { fontSize: 10, color: colors.white, fontFamily: 'Inter-Semibold' },
   resumeButton: { height: 50, borderRadius: 12, justifyContent: 'center', alignItems: 'center', width: '100%' },
-  resumeButtonText: { color: '#ffffff', fontSize: 15, fontFamily: 'Inter-Semibold' },
+  resumeButtonText: { color: colors.white, fontSize: 15, fontFamily: 'Inter-Semibold' },
   recommendedItem: { flexDirection: 'row', marginBottom: 30 },
-  iconBox: { width: 50, height: 50, backgroundColor: '#eeeeee', borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
+  iconBox: { width: 50, height: 50, backgroundColor: colors.cardDark, borderRadius: 12, justifyContent: 'center', alignItems: 'center', marginRight: 16 },
   itemInfo: { flex: 1 },
-  itemTitle: { fontSize: 18, color: '#1a1c1c', marginBottom: 4, fontFamily: 'CabinetGrotesk-Bold' },
-  itemSubtitle: { fontSize: 14, color: '#474747', marginBottom: 12, fontFamily: 'Inter-Regular' },
+  itemTitle: { fontSize: 18, color: colors.primary, marginBottom: 4, fontFamily: 'CabinetGrotesk-Bold' },
+  itemSubtitle: { fontSize: 14, color: colors.textBody, marginBottom: 12, fontFamily: 'Inter-Regular' },
   itemFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  itemStatus: { fontSize: 12, color: '#5f5e5e', fontFamily: 'Inter-Medium' },
-  statusBadge: { backgroundColor: '#d6d4d3', paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
-  statusBadgeText: { fontSize: 10, color: '#1b1c1c', fontFamily: 'Inter-Semibold' },
-  promptContainer: { marginBottom: 20, borderRadius: 24, overflow: 'hidden', elevation: 8, shadowColor: '#000', shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20 },
+  itemStatus: { fontSize: 12, color: colors.textLight, fontFamily: 'Inter-Medium' },
+  statusBadge: { backgroundColor: colors.cardDarkest, paddingHorizontal: 8, paddingVertical: 4, borderRadius: 999 },
+  statusBadgeText: { fontSize: 10, color: colors.primary, fontFamily: 'Inter-Semibold' },
+  promptContainer: { marginBottom: 20, borderRadius: 24, overflow: 'hidden', elevation: 8, shadowColor: colors.black, shadowOffset: { width: 0, height: 10 }, shadowOpacity: 0.15, shadowRadius: 20 },
   promptGradient: { padding: 20 },
   promptContent: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  promptIconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: '#ffffff', justifyContent: 'center', alignItems: 'center', marginRight: 14 },
+  promptIconCircle: { width: 44, height: 44, borderRadius: 22, backgroundColor: colors.white, justifyContent: 'center', alignItems: 'center', marginRight: 14 },
   promptTextContainer: { flex: 1 },
-  promptText: { color: '#ffffff', fontSize: 15, fontFamily: 'Inter-Medium', lineHeight: 20 },
+  promptText: { color: colors.white, fontSize: 15, fontFamily: 'Inter-Medium', lineHeight: 20 },
   promptActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: 12 },
   cancelBtn: { paddingHorizontal: 16, paddingVertical: 10, borderRadius: 12, backgroundColor: 'rgba(255, 255, 255, 0.1)' },
-  cancelBtnText: { color: '#ffffff', fontSize: 14, fontFamily: 'Inter-Medium' },
-  completeBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, backgroundColor: '#ffffff' },
-  completeBtnText: { color: '#1a1c1c', fontSize: 14, fontFamily: 'Inter-Bold' },
+  cancelBtnText: { color: colors.white, fontSize: 14, fontFamily: 'Inter-Medium' },
+  completeBtn: { paddingHorizontal: 20, paddingVertical: 10, borderRadius: 12, backgroundColor: colors.white },
+  completeBtnText: { color: colors.primary, fontSize: 14, fontFamily: 'Inter-Bold' },
 });
 
 

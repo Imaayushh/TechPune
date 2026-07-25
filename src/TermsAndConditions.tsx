@@ -12,6 +12,7 @@ import { useNavigation } from '@react-navigation/native';
 import { Heroicon } from './Heroicon';
 import PageHeader from './components/PageHeader';
 import { useFadeIn } from './hooks/useFadeIn';
+import { colors } from './constants/theme';
 
 export default function TermsAndConditions() {
   const navigation = useNavigation();
@@ -77,13 +78,13 @@ export default function TermsAndConditions() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fcfcfc' },
+  container: { flex: 1, backgroundColor: colors.background },
   scrollContent: { paddingBottom: 48 },
   contentContainer: { marginHorizontal: 20, paddingVertical: 24 },
-  title: { fontSize: 28, fontFamily: 'ClashDisplay-Bold', color: '#1a1c1c', marginBottom: 24 },
-  sectionHeading: { fontSize: 16, fontFamily: 'CabinetGrotesk-Bold', color: '#1a1c1c', marginTop: 20, marginBottom: 12 },
-  bodyText: { fontSize: 15, color: '#1a1c1c', fontFamily: 'Inter-Regular', lineHeight: 22, marginBottom: 16 },
-  acceptContainer: { paddingHorizontal: 20, paddingVertical: 16, backgroundColor: '#fcfcfc' },
-  acceptButton: { height: 58, borderRadius: 999, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1c1c' },
+  title: { fontSize: 28, fontFamily: 'ClashDisplay-Bold', color: colors.primary, marginBottom: 24 },
+  sectionHeading: { fontSize: 16, fontFamily: 'CabinetGrotesk-Bold', color: colors.primary, marginTop: 20, marginBottom: 12 },
+  bodyText: { fontSize: 15, color: colors.primary, fontFamily: 'Inter-Regular', lineHeight: 22, marginBottom: 16 },
+  acceptContainer: { paddingHorizontal: 20, paddingVertical: 16, backgroundColor: colors.background },
+  acceptButton: { height: 58, borderRadius: 999, justifyContent: 'center', alignItems: 'center', backgroundColor: colors.primary },
   acceptButtonText: { color: '#e2e2e2', fontSize: 16, fontFamily: 'Inter-Semibold', letterSpacing: 0.2 },
 });
